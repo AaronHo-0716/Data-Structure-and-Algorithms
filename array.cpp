@@ -2,12 +2,12 @@
 // Use APA style citations within your code as comments and also mention them in your report.
 // cite the code from outside
 #include "csv.hpp"
-// #include "date/tz.h"
+#include "date.h"
 #include <iostream>
-#include <regex>
 
-using namespace csv;
 using namespace std;
+using namespace csv;
+using namespace dateParsing;
 
 string (*readFile(string filename))[4] { 
     CSVReader reader(filename);
@@ -20,11 +20,11 @@ string (*readFile(string filename))[4] {
 
         for (CSVField &field : row) {
             data = field.get();
+            
             file[rowIdx][colIdx] = (data == " " || (data.empty())) ? "NULL" : data;
             
             if (colIdx == 3) { // change the format of the date
-                data.pop_back();
-                file[rowIdx][colIdx] = regex_replace(data, regex(", | "), "/");
+                file[rowIdx][3] = dateParsing::Date(data).getDate();
             }
             colIdx++;
         }
@@ -46,8 +46,8 @@ void readArray(string (*news)[4]) {
 int main() {
     string (*fakeN)[4] = readFile("fake.csv");
     string (*trueN)[4] = readFile("true.csv"); 
-    readArray(trueN);
-
+    // string (*testN)[4] = readFile("test.csv"); 
+    // readArray(testN);
 }
 
 // sort
