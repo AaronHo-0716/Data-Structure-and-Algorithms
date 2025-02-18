@@ -10,14 +10,15 @@ using namespace std;
 
 namespace dateParsing {
     struct Date {
-        int day, month, year;
-        map<string, int> monthMap = {
-            {"January", 1},   {"February", 2}, {"March", 3},     {"April", 4},
-            {"May", 5},       {"June", 6},     {"July", 7},      {"August", 8},
-            {"September", 9}, {"October", 10}, {"November", 11}, {"December", 12}
-        };
-    
+        private: 
+            map<string, int> monthMap = {
+                {"January", 1},   {"February", 2}, {"March", 3},     {"April", 4},
+                {"May", 5},       {"June", 6},     {"July", 7},      {"August", 8},
+                {"September", 9}, {"October", 10}, {"November", 11}, {"December", 12}
+            };
         public:
+            int day, month, year;
+    
             Date() : day(0), month(0), year(0) {}
 
             Date(string dateString) {
@@ -33,18 +34,6 @@ namespace dateParsing {
         
             string getDate() {
                 return to_string(year) + "-" + to_string(month) + "-" + to_string(day);
-            }
-    
-            int getDay(){
-                return day;
-            }
-    
-            int getMonth() {
-                return month;
-            }
-    
-            int getYear() {
-                return year;
             }
     };
 }
