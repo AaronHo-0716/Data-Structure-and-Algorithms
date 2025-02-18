@@ -25,6 +25,7 @@ struct myArray {
     public: 
         string col[3];
         Date col3;
+        int arraySize = 0;
 
         myArray() : col{ "", "NULL", "" }, col3(Date("")) {}
 
@@ -64,18 +65,28 @@ myArray** readFile(string filename) {
         file[rowIdx] = new myArray(row);
         rowIdx++;
     }
+    (*file) -> arraySize = rowIdx;
     
-    (filename == "true.csv") ? cout << "True rows: " << rowIdx << endl : cout << "False rows: " << rowIdx << endl; // debug line
+    // (filename == "true.csv") ? cout << "True rows: " << rowIdx << endl : cout << "False rows: " << rowIdx << endl; // debug line
     // true - 21417, false - 23481
     return file;
 }
 
 void readArray(myArray** file) {
-    for (int i = 0; i < 23500; i++) {
+    for (int i = 0; i < (**file).arraySize ; i++) {
         for (int j = 0; j < 4; j++) {
             cout << "data[" << i << "][" << j << "] = " << file[i]->operator[](j) << endl;
         }
     }
+}
+
+void percentage(myArray** trueN, myArray** fakeN) {
+    int total = ((**trueN).arraySize + (**fakeN).arraySize);
+
+    float percentage = (static_cast<float>((**fakeN).arraySize) / total) * 100;
+    
+    
+    cout << percentage << "%" << endl;
 }
 
 int main() {
@@ -92,47 +103,15 @@ int main() {
 
     cout << "True: " << (duration_cast<milliseconds>(stopT - startT)).count() << "ms" << endl;
 
-
-
+    percentage(trueN, fakeN);
+    // auto startTest = high_resolution_clock::now();
     // myArray** testN = readFile("test.csv"); 
+    // auto stopTest = high_resolution_clock::now();
+
+    // cout << "Test: " << (duration_cast<milliseconds>(stopTest - startTest)).count() << "ms" << endl;
     // readArray(testN);
 }
 
-/*
-string (*readFile(string filename))[4] { 
-    CSVReader reader(filename);
-    string (*file)[4] = new string[23500][4]; // head allcation of an array
-    int rowIdx = 0;
 
-    for (CSVRow &row : reader) {
-        int colIdx = 0;
-        string data;
-
-        for (CSVField &field : row) {
-            data = field.get();
-            
-            file[rowIdx][colIdx] = (data == " " || (data.empty())) ? "NULL" : data;
-            
-            if (colIdx == 3) { // change the format of the date
-                file[rowIdx][3] = dateParsing::Date(data).getDate();
-            }
-            colIdx++;
-        }
-        rowIdx++;
-    }
-
-    (filename == "true.csv") ? cout << "True rows: " << rowIdx << endl : cout << "False rows: " << rowIdx << endl; // debug line
-    // true - 21417, false - 23481
-    return file;
-}
-
-void readArray(string (*news)[4]) {
-    for (int i = 0; i < 23500; i++) {
-        for (int j = 0; j < 4; j++) {
-            cout << "data[" << i << "][" << j << "] = " << news[i][j] << std::endl;
-        }
-    }
-}
-*/
 // sort
 // year-based sorting is fully demonstrated.
