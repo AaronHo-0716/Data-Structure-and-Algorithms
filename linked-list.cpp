@@ -30,6 +30,8 @@ struct Date {
     month = monthMap[monthStr];
   }
 
+  Date() : day(0), month(0), year(0) {}
+
   string getDate() {
     return to_string(year) + "-" + to_string(month) + "-" + to_string(day);
   }
@@ -39,11 +41,17 @@ struct Node {
   string title;
   string content;
   string category;
+  Date date;
 
   Node *next;
   Node *prev;
 
-  Node(int value) {}
+  Node(string title, string content, string category, string date) {
+    this->title = title;
+    this->content = content;
+    this->category = category;
+    this->date = Date(date);
+  }
 };
 
 int main() {
