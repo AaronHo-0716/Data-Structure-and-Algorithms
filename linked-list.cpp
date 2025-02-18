@@ -1,41 +1,13 @@
 #include "csv.hpp"
+#include "date.h"
 #include <iostream>
-#include <map>
-#include <sstream>
 #include <string>
 
 using namespace csv;
 using namespace std;
+using namespace dateParsing;
 
 CSVReader reader("test.csv");
-
-map<string, int> monthMap = {
-    {"January", 1},   {"February", 2}, {"March", 3},     {"April", 4},
-    {"May", 5},       {"June", 6},     {"July", 7},      {"August", 8},
-    {"September", 9}, {"October", 10}, {"November", 11}, {"December", 12}};
-
-struct Date {
-  int day;
-  int month;
-  int year;
-
-  Date(string dateString) {
-    istringstream ss(dateString);
-    string monthStr;
-
-    ss >> monthStr >> day;
-    ss.ignore(1);
-    ss >> year;
-
-    month = monthMap[monthStr];
-  }
-
-  Date() : day(0), month(0), year(0) {}
-
-  string getDate() {
-    return to_string(year) + "-" + to_string(month) + "-" + to_string(day);
-  }
-};
 
 struct Node {
   string title;
