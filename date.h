@@ -18,6 +18,8 @@ namespace dateParsing {
         };
     
         public:
+            Date() : day(0), month(0), year(0) {}
+
             Date(string dateString) {
                 istringstream ss(dateString); // Using istringstream for String Parsing
                 string monthStr;
