@@ -2,12 +2,13 @@
 #include "date.h"
 #include <iostream>
 #include <string>
+#include <chrono>
 
 using namespace csv;
 using namespace std;
 using namespace dateParsing;
 
-CSVReader reader("test.csv");
+CSVReader reader("true.csv");
 
 struct Node {
   string title;
@@ -33,6 +34,10 @@ struct News {
 
   News() : counter(0), head(nullptr), tail(nullptr) {}
 
+  void printNewsCount() {
+    cout << counter << endl;
+  }
+
   void insertAtBack(string title, string content, string category, string date) {
     Node *node = new Node(title, content, category, date);
     if (head == nullptr) {
@@ -44,12 +49,12 @@ struct News {
       tail = node;
     }
     counter++;
-    cout << counter << endl;
   }
 };
 
 int main() {
-  News testNews = News();
+  News trueNews = News();
+  auto start = chrono::high_resolution_clock::now();
   for (CSVRow &row : reader) {
     string entries[4];
     int counter = 0;
@@ -57,6 +62,10 @@ int main() {
       entries[counter] = field.get();
       counter++;
     }
-    testNews.insertAtBack(entries[0], entries[1], entries[2], entries[3]);
+    trueNews.insertAtBack(entries[0], entries[1], entries[2], entries[3]);
   }
+  auto stop = chrono::high_resolution_clock::now();
+  trueNews.printNewsCount();
+  auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
+  cout << "Time spent constructing the linked list: " << duration.count() << " miliseconds" << endl;
 }
