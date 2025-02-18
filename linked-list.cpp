@@ -54,10 +54,37 @@ struct Node {
   }
 };
 
-int main() {
-  for (CSVRow &row : reader) {
-    for (CSVField &field : row) {
-      cout << field.get() << endl;
+struct News {
+  int counter;
+  Node* head;
+  Node* tail;
+
+  News() : counter(0), head(nullptr), tail(nullptr) {}
+
+  void insertAtBack(string title, string content, string category, string date) {
+    Node *node = new Node(title, content, category, date);
+    if (head == nullptr) {
+      head = node;
+      tail = node;
+    } else {
+      node->prev = tail;
+      tail->next = node;
+      tail = node;
     }
+    counter++;
+    cout << counter << endl;
+  }
+};
+
+int main() {
+  News testNews = News();
+  for (CSVRow &row : reader) {
+    string entries[4];
+    int counter = 0;
+    for (CSVField &field : row) {
+      entries[counter] = field.get();
+      counter++;
+    }
+    testNews.insertAtBack(entries[0], entries[1], entries[2], entries[3]);
   }
 }
