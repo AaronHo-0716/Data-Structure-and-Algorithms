@@ -25,15 +25,18 @@ public:
   Date() : day(0), month(0), year(0) {}
 
   Date(string dateString) {
-    if (dateString.find("-") != string::npos) {
-      parseDashFormat(dateString);
-    } else if(dateString.find(",") != string::npos){
-      parseTextFormat(dateString);
+    if (dateString.length() >= 25){
+        day = 0;
+        month = 0;
+        year = 0;
     } else {
-      day = 0;
-      month = 0;
-      year = 0;
+        if (dateString.find("-") != string::npos) {
+            parseDashFormat(dateString);
+        } else if(dateString.find(",") != string::npos){
+            parseTextFormat(dateString);
+        } 
     }
+
   }
 
   string getDate() {
@@ -43,6 +46,7 @@ public:
   void parseTextFormat(string dateString) {
     istringstream ss(dateString);
     string monthStr;
+    
 
     ss >> monthStr >> day;
     ss.ignore(1);
@@ -71,6 +75,6 @@ public:
     }
   }
 };
-} // namespace dateParsing
+} 
 
 #endif
