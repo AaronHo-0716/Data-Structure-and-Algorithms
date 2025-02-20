@@ -71,6 +71,16 @@ struct News {
   }
 };
 
+void printNewsPercentage() {}
+void sortArticle() {
+  cout << "Sort articles:" << endl;
+  cout << "1. Merge Sort" << endl;
+  cout << "2. Bubble Sort" << endl;
+
+}
+void mostFrequentWord() {}
+void searchArticle() {}
+
 int main() {
   News trueNews = News();
   News fakeNews = News();
@@ -92,8 +102,9 @@ int main() {
 
   auto durationReadingTrue = chrono::duration_cast<chrono::milliseconds>(
       stopOfReadingTrue - startOfReadingTrue);
-  cout << "Time spent loading true news: "
-       << durationReadingTrue.count() << " miliseconds\n" << endl;
+  cout << "Time spent loading true news: " << durationReadingTrue.count()
+       << " miliseconds\n"
+       << endl;
 
   CSVReader reader("fake.csv");
   auto startOfReadingFake = chrono::high_resolution_clock::now();
@@ -113,14 +124,24 @@ int main() {
 
   auto durationReadingFake = chrono::duration_cast<chrono::milliseconds>(
       stopOfReadingFake - startOfReadingFake);
-  cout << "Time spent loading fake news: "
-       << durationReadingFake.count() << " miliseconds\n" << endl;
+  cout << "Time spent loading fake news: " << durationReadingFake.count()
+       << " miliseconds\n"
+       << endl;
 
-  /*auto startOfPrintingTrue = chrono::high_resolution_clock::now();*/
-  /*trueNews.traverse();*/
-  /*auto stopOfPrintingTrue = chrono::high_resolution_clock::now();*/
-  /*auto durationPrintingTrue = chrono::duration_cast<chrono::milliseconds>(*/
-  /*      stopOfPrintingTrue - startOfPrintingTrue);*/
-  /*cout << "Time spent printing all the true news: "*/
-  /*     << durationReadingTrue.count() << " miliseconds" << endl;*/
+  while (true) {
+    int choice = 0;
+    cout << "Please choose one option: " << endl;
+    cout << "1. Percentage of fake news pew year." << endl;
+    cout << "2. Sort the news article by year." << endl;
+    cout << "3. Most frequent words in goverment fake news." << endl;
+    cout << "4. Search article." << endl;
+    cout << "5. Exit" << endl;
+
+    cin >> choice;
+
+    switch (choice) {
+    case 1: {
+    }
+    }
+  }
 }
