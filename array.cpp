@@ -7,6 +7,7 @@
 #include <chrono>
 #include <variant>
 #include <algorithm>
+#include <iomanip>
 
 using namespace std;
 using namespace csv;
@@ -123,10 +124,8 @@ void merge(myArray** file, int left, int mid, int right) {
 
     // Merge process
     while (i < n1 && j < n2) {        
-        if (Ltemp[i].col3.year < Rtemp[j].col3.year ||
-            (Ltemp[i].col3.year == Rtemp[j].col3.year && Ltemp[i].col3.month < Rtemp[j].col3.month) ||
-            (Ltemp[i].col3.year == Rtemp[j].col3.year && Ltemp[i].col3.month == Rtemp[j].col3.month && Ltemp[i].col3.day < Rtemp[j].col3.day)) {
-                *file[k] = Ltemp[i++];
+        if (tie(Ltemp[i].col3.year, Ltemp[i].col3.month, Ltemp[i].col3.day) < tie(Rtemp[j].col3.year, Rtemp[j].col3.month, Rtemp[j].col3.day)) {    
+            *file[k] = Ltemp[i++];
         } else {
             *file[k] = Rtemp[j++];
         }
@@ -151,22 +150,80 @@ void mergeSort(myArray** file, int left, int right) {
     }
 }
 
-void percentage(myArray** trueN, myArray** fakeN, int trueRow, int fakeRow) {
-    int input = -1;
-    float total = 0;
-    int fake = 0;
+int counter(myArray** file, int rowCount, int year, int month) {
+    int count = 0;
+    for (int i = 0; i < rowCount; i++) {
+        if ((file[i]->col3).year == year && (file[i]->col3).month == month) {
+            count++;
+        }
+    }
+    return count;
+}
 
-        // Input validation loop
+int counter(myArray** file, int rowCount, int year) {
+    int count = 0;
+    for (int i = 0; i < rowCount; i++) {
+        if ((file[i]->col3).year == year) {
+            count++;
+        }
+    }
+    return count;
+}
+
+int getYearInput() {
+    int input;
+
+    while (1) {
+        cout << "Enter year: ";
+
+        if (!(cin >> input) || input < 2014 || input > 2019) {
+            cout << "Invalid input. Please enter a valid year in 2015 to 2018." << endl;
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            continue;
+        }
+        return input;
+    }  
+}
+
+void printPercentageGraphic(myArray** trueN, myArray** fakeN, int trueRow, int fakeRow, int input){
+    float eachmonth[12];
+
+    int fYear = counter(fakeN, fakeRow, input);
+    int tYear = counter(trueN, trueRow, input); 
+
+    cout << "\nPercentage of Fake News in " << input << endl;
+    for (int i = 0; i < 12; i++) {
+        int f = counter(fakeN, fakeRow, input, i);
+        eachmonth[i] = f / static_cast<float>(fYear + tYear)*100;
+    }
+
+    for (int i = 0; i < 12; i++) {
+        cout << left;
+            cout << setw(12) << Date().reverseMonthMap[i + 1] << ": ";  // Space before asterisks
+
+            cout << setw(2) << "" ;
+            for (int j = 0; j < (static_cast<int>(eachmonth[i])); j++) cout << "*";
+            
+            cout << setw(110 - static_cast<int>(eachmonth[i])) << ""  // Adjust spacing dynamically
+                << right << setw(6)  // Ensure percentage is right-aligned
+                << fixed << setprecision(2) << eachmonth[i] << "%" << endl;
+    }
+    cout << "Node: Each '*' is represent 1\"%\" of fake new." << endl;
+}
+
+void printNewsPercentage(myArray** trueN, myArray** fakeN, int trueRow, int fakeRow) {
+    int input = -1, year = 2015;
+
     while (1) {
         cout << "Do you want to do any filter\n"
-                << "1. Month\n"
-                << "2. Year\n"
-                << "3. No\n"
+                << "1. Year\n"
+                << "2. No Filter\n"
                 << "0. Exit\n"
                 << ": ";
 
-        if (!(cin >> input) || input < 0 || input > 3) {
-            cout << "Invalid input. Please enter a valid integer (0, 1, 2, or 3)." << endl;
+        if (!(cin >> input) || input < 0 || input > 2) {
+            cout << "Invalid input. Please enter a valid integer (0, 1 or 2)." << endl;
             cin.clear(); 
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
             continue;
@@ -174,19 +231,13 @@ void percentage(myArray** trueN, myArray** fakeN, int trueRow, int fakeRow) {
 
         switch (input) {
             case 1:
-                // Do filter for month
-                cout << "MONTH" << endl;
+                printPercentageGraphic(trueN, fakeN, trueRow, fakeRow, getYearInput());
                 break;
 
             case 2:
-                // Do filter for year
-                cout << "Year" << endl;
-                break;
-
-            case 3:
-                total = static_cast<float>(trueRow + fakeRow);
-                fake = fakeRow;
-                cout << "Percentage: " << (fake / total) * 100 << "%" << endl;
+                for (int i = 0; i < 4; i++) {
+                    printPercentageGraphic(trueN, fakeN, trueRow, fakeRow, year++);
+                }
                 break;
 
             default: // case 0
@@ -195,27 +246,6 @@ void percentage(myArray** trueN, myArray** fakeN, int trueRow, int fakeRow) {
 
         break;
     }     
-}
-
-void filterByYear() {
-    int input; 
-
-    while (1) {
-        cout << "Do you want to do any filter\n"
-                << "1. Month\n"
-                << "2. Year\n"
-                << "3. No\n"
-                << "0. Exit\n"
-                << ": ";
-
-        if (!(cin >> input) || input < 0 || input > 3) {
-            cout << "Invalid input. Please enter a valid integer (0, 1, 2, or 3)." << endl;
-            cin.clear(); 
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
-            continue;
-        }
-        break;
-    }  
 }
 
 int* findUnique(myArray** file, int rowCount, int sizeY) {
@@ -243,10 +273,6 @@ string* findUniqueSubject(myArray** file, int rowCount, int size) {
     return arr;
 }
 
-void printNewsPercentage() {
-
-}
-
 void sortArticle() {
     cout << "Sort articles:" << endl;
     cout << "1. Merge Sort" << endl;
@@ -270,7 +296,7 @@ void menu() {
         cin >> choice;
 
         switch (choice) {
-            case 1: printNewsPercentage(); break;
+            // case 1: printNewsPercentage(); break;
             case 2: sortArticle(); break;
             case 3: mostFrequentWord(); break;
             case 4: searchArticle(); break;
@@ -283,46 +309,47 @@ void menu() {
 int main() {
     // fake.csv
     auto startF = high_resolution_clock::now();
-    int rowCount = 0;
+    int FakerowCount = 0;
 
-    myArray** fakeN = readFile("fake.csv", rowCount);
+    myArray** fakeN = readFile("fake.csv", FakerowCount);
     if (!fakeN) return -1;  // Error handling
     
     // action here
-    // mergeSort(fakeN, 0, rowCount - 1);
+    mergeSort(fakeN, 0, FakerowCount - 1);
+    for (int i = 0; i < FakerowCount; i++) {
+        cout << i << ": " << get<Date>((*fakeN[i])[3]).getDate() << endl;
+        // cout << i << ": " << (fakeN[i]->col3).getDate() << endl;
+    }
 
-    // int sizeY = (rowCount > 23000) ? 6 : 2;
+    // get the unique year
+    // int sizeY = (rowCount > 23000) ? 4 : 2;
     // int* yearY = findUnique(fakeN, rowCount, sizeY);
     // for (int i = 0; i < sizeY; i++) {
-    //     cout << year[i] << endl;
+    //     cout << yearY[i] << endl;
     // }
 
+    // get the unique subject (xx news)
     // int sizeS = (rowCount > 23000) ? 6 : 2;
     // string* subject = findUniqueSubject(fakeN, rowCount, sizeS);
     // for (int i = 0; i < sizeS; i++) {
     //     cout << subject[i] << endl;
     // }
 
-    for (int i = 0; i < rowCount; i++) delete fakeN[i]; // Free memory
-    delete[] fakeN;
-
-    auto stopF = high_resolution_clock::now();
-    cout << "Fake: " << (duration_cast<milliseconds>(stopF - startF)).count() << "ms" << endl;
-    
-
 
 
     // true.csv
     auto startT = high_resolution_clock::now();
-    int rowCount2 = 0;
-    myArray** trueN = readFile("true.csv", rowCount2);
+    int TrueRowCount = 0;
+    myArray** trueN = readFile("true.csv", TrueRowCount);
     if (!trueN) return -1;  // Error handling
 
-    percentage(trueN, fakeN, rowCount2, rowCount);
-
-    for (int i = 0; i < rowCount; i++) delete trueN[i]; // delete memory
+    for (int i = 0; i < FakerowCount; i++) delete fakeN[i]; // Free memory
+    delete[] fakeN;
+    for (int i = 0; i < FakerowCount; i++) delete trueN[i]; // delete memory
     delete[] trueN;
 
+    auto stopF = high_resolution_clock::now();
+    cout << "Fake: " << (duration_cast<milliseconds>(stopF - startF)).count() << "ms" << endl;
     auto stopT = high_resolution_clock::now();
     cout << "True: " << (duration_cast<milliseconds>(stopT - startT)).count() << "ms" << endl;
 
