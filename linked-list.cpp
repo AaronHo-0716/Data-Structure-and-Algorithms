@@ -73,7 +73,10 @@ struct News {
 
 int main() {
   News trueNews = News();
+  News fakeNews = News();
+
   auto startOfReadingTrue = chrono::high_resolution_clock::now();
+
   for (CSVRow &row : reader) {
     string entries[4];
     int counter = 0;
@@ -84,17 +87,40 @@ int main() {
     trueNews.insertAtBack(entries[0], entries[1], entries[2], entries[3]);
   }
   auto stopOfReadingTrue = chrono::high_resolution_clock::now();
+  cout << "Numbers of true news loaded: " << endl;
   trueNews.printNewsCount();
+
   auto durationReadingTrue = chrono::duration_cast<chrono::milliseconds>(
       stopOfReadingTrue - startOfReadingTrue);
-  cout << "Time spent constructing the linked list: "
-       << durationReadingTrue.count() << " miliseconds" << endl;
+  cout << "Time spent loading true news: "
+       << durationReadingTrue.count() << " miliseconds\n" << endl;
 
-  auto startOfPrintingTrue = chrono::high_resolution_clock::now();
-  trueNews.traverse();
-  auto stopOfPrintingTrue = chrono::high_resolution_clock::now();
-  auto durationPrintingTrue = chrono::duration_cast<chrono::milliseconds>(
-        stopOfPrintingTrue - startOfPrintingTrue);
-  cout << "Time spent printing all the true news: "
-       << durationReadingTrue.count() << " miliseconds" << endl;
+  CSVReader reader("fake.csv");
+  auto startOfReadingFake = chrono::high_resolution_clock::now();
+
+  for (CSVRow &row : reader) {
+    string entries[4];
+    int counter = 0;
+    for (CSVField &field : row) {
+      entries[counter] = field.get();
+      counter++;
+    }
+    fakeNews.insertAtBack(entries[0], entries[1], entries[2], entries[3]);
+  }
+  auto stopOfReadingFake = chrono::high_resolution_clock::now();
+  cout << "Numbers of fake news loaded: " << endl;
+  fakeNews.printNewsCount();
+
+  auto durationReadingFake = chrono::duration_cast<chrono::milliseconds>(
+      stopOfReadingFake - startOfReadingFake);
+  cout << "Time spent loading fake news: "
+       << durationReadingFake.count() << " miliseconds\n" << endl;
+
+  /*auto startOfPrintingTrue = chrono::high_resolution_clock::now();*/
+  /*trueNews.traverse();*/
+  /*auto stopOfPrintingTrue = chrono::high_resolution_clock::now();*/
+  /*auto durationPrintingTrue = chrono::duration_cast<chrono::milliseconds>(*/
+  /*      stopOfPrintingTrue - startOfPrintingTrue);*/
+  /*cout << "Time spent printing all the true news: "*/
+  /*     << durationReadingTrue.count() << " miliseconds" << endl;*/
 }
