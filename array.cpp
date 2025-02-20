@@ -200,14 +200,14 @@ void printPercentageGraphic(myArray** trueN, myArray** fakeN, int trueRow, int f
 
     for (int i = 0; i < 12; i++) {
         cout << left;
-            cout << setw(12) << Date().reverseMonthMap[i + 1] << ": ";  // Space before asterisks
+        cout << setw(12) << Date().reverseMonthMap[i + 1] << ": ";  // Space before asterisks
 
-            cout << setw(2) << "" ;
-            for (int j = 0; j < (static_cast<int>(eachmonth[i])); j++) cout << "*";
-            
-            cout << setw(110 - static_cast<int>(eachmonth[i])) << ""  // Adjust spacing dynamically
-                << right << setw(6)  // Ensure percentage is right-aligned
-                << fixed << setprecision(2) << eachmonth[i] << "%" << endl;
+        cout << setw(2) << "" ;
+        for (int j = 0; j < (static_cast<int>(eachmonth[i])); j++) cout << "*";
+        
+        cout << setw(110 - static_cast<int>(eachmonth[i])) << ""  // Adjust spacing dynamically
+            << right << setw(6)  // Ensure percentage is right-aligned
+            << fixed << setprecision(2) << eachmonth[i] << "%" << endl;
     }
     cout << "Node: Each '*' is represent 1\"%\" of fake new." << endl;
 }
