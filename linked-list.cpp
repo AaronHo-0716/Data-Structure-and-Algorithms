@@ -135,9 +135,7 @@ int main() {
     cout << "2. Sort the news article by year." << endl;
     cout << "3. Most frequent words in goverment fake news." << endl;
     cout << "4. Search article." << endl;
-    cout << "5. Exit" << endl;
-
-    cin >> choice;
+    cout << "5. Exit: ", cin >> choice;
 
     switch (choice) {
     case 1: {
