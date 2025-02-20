@@ -212,7 +212,7 @@ void printPercentageGraphic(myArray** trueN, myArray** fakeN, int trueRow, int f
     cout << "Node: Each '*' is represent 1\"%\" of fake new." << endl;
 }
 
-void printNewsPercentage(myArray** trueN, myArray** fakeN, int trueRow, int fakeRow) {
+void NewsPercentageMenu(myArray** trueN, myArray** fakeN, int trueRow, int fakeRow) {
     int input = -1, year = 2015;
 
     while (1) {
@@ -235,9 +235,7 @@ void printNewsPercentage(myArray** trueN, myArray** fakeN, int trueRow, int fake
                 break;
 
             case 2:
-                for (int i = 0; i < 4; i++) {
-                    printPercentageGraphic(trueN, fakeN, trueRow, fakeRow, year++);
-                }
+                for (int i = 0; i < 4; i++) printPercentageGraphic(trueN, fakeN, trueRow, fakeRow, year++);
                 break;
 
             default: // case 0
