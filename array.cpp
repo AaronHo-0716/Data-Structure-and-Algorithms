@@ -123,7 +123,8 @@ void merge(myArray** file, int left, int mid, int right) {
     int i = 0, j = 0, k = left;
 
     // Merge process
-    while (i < n1 && j < n2) {        
+    while (i < n1 && j < n2) {       
+        // compares year first, then month, then day 
         if (tie(Ltemp[i].col3.year, Ltemp[i].col3.month, Ltemp[i].col3.day) < tie(Rtemp[j].col3.year, Rtemp[j].col3.month, Rtemp[j].col3.day)) {    
             *file[k] = Ltemp[i++];
         } else {
@@ -191,21 +192,21 @@ void printPercentageGraphic(myArray** trueN, myArray** fakeN, int trueRow, int f
 
     int fYear = counter(fakeN, fakeRow, input);
     int tYear = counter(trueN, trueRow, input); 
-
-    cout << "\nPercentage of Fake News in " << input << endl;
+    
     for (int i = 0; i < 12; i++) {
         int f = counter(fakeN, fakeRow, input, i);
         eachmonth[i] = f / static_cast<float>(fYear + tYear)*100;
     }
 
+    cout << "\nPercentage of Fake News in " << input << endl;
     for (int i = 0; i < 12; i++) {
         cout << left;
-        cout << setw(12) << Date().reverseMonthMap[i + 1] << ": ";  // Space before asterisks
+        cout << setw(12) << Date().reverseMonthMap[i + 1] << ": ";  
 
         cout << setw(2) << "" ;
         for (int j = 0; j < (static_cast<int>(eachmonth[i])); j++) cout << "*";
         
-        cout << setw(110 - static_cast<int>(eachmonth[i])) << ""  // Adjust spacing dynamically
+        cout << setw(110 - static_cast<int>(eachmonth[i])) << ""  
             << right << setw(6)  // Ensure percentage is right-aligned
             << fixed << setprecision(2) << eachmonth[i] << "%" << endl;
     }
@@ -235,7 +236,8 @@ void NewsPercentageMenu(myArray** trueN, myArray** fakeN, int trueRow, int fakeR
                 break;
 
             case 2:
-                for (int i = 0; i < 4; i++) printPercentageGraphic(trueN, fakeN, trueRow, fakeRow, year++);
+                for (int i = 0; i < 4; i++) 
+                    printPercentageGraphic(trueN, fakeN, trueRow, fakeRow, year++);
                 break;
 
             default: // case 0
@@ -246,12 +248,12 @@ void NewsPercentageMenu(myArray** trueN, myArray** fakeN, int trueRow, int fakeR
     }     
 }
 
-int* findUnique(myArray** file, int rowCount, int sizeY) {
-    int* arr = new int[sizeY];
+int* findUnique(myArray** file, int rowCount, int size) {
+    int* arr = new int[size];
     int count = 0;
 
     for (int i = 0; i < rowCount; i++) {
-        // Use find to check if file[i]->col3.year already exists in arr
+        // arr + count = pointer that pointing at the end
         if (file[i]->col3.year != 0 && find(arr, arr + count, file[i]->col3.year) == arr + count) {
             arr[count++] = file[i]->col3.year;  
         }
@@ -352,4 +354,12 @@ int main() {
     cout << "True: " << (duration_cast<milliseconds>(stopT - startT)).count() << "ms" << endl;
 
     return 0;
+
+    // time = sort by year and display total
+    // sort by (display in ascending)
+        // - year
+    // search article based on (display)
+        // - year
+        // - subject
+
 }
