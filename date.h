@@ -27,8 +27,12 @@ public:
   Date(string dateString) {
     if (dateString.find("-") != string::npos) {
       parseDashFormat(dateString);
-    } else {
+    } else if(dateString.find(",") != string::npos){
       parseTextFormat(dateString);
+    } else {
+      day = 0;
+      month = 0;
+      year = 0;
     }
   }
 
