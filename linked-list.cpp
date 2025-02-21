@@ -69,14 +69,47 @@ struct News {
       }
     }
   }
+
+  int newsPerMonthByYear(int month, int year) {
+    Node *current = head;
+    int counter = 0;
+    if (current == nullptr) {
+      cout << "News is empty" << endl;
+    } else {
+      while (current != nullptr) {
+        if (current->date.month == month && current->date.year == year) {
+          counter++;
+        }
+        current = current->next;
+      }
+    }
+
+    return counter;
+  }
 };
 
-void printNewsPercentage() {}
+void printNewsPercentage(News trueNews, News fakeNews) {
+  int filterYear;
+  int trueNewsPerMonth[12] = {};
+  int fakeNewsPerMonth[12] = {};
+
+  cout << "Welcome to Percentage of Fake Politcal News Article" << endl;
+  cout << "Please enter the year you want to search: ", cin >> filterYear;
+
+  for(int i = 0; i < 12; i++) {
+    trueNewsPerMonth[i] = trueNews.newsPerMonthByYear(i + 1, filterYear);
+    fakeNewsPerMonth[i] = fakeNews.newsPerMonthByYear(i + 1, filterYear);
+  }
+  for(int i = 0; i < 12; i++) {
+    cout << i << endl;
+    cout << "True news: " << trueNewsPerMonth[i] << endl;
+    cout << "Fake news: "<< fakeNewsPerMonth[i] << endl;
+  }
+}
 void sortArticle() {
   cout << "Sort articles:" << endl;
   cout << "1. Merge Sort" << endl;
   cout << "2. Bubble Sort" << endl;
-
 }
 void mostFrequentWord() {}
 void searchArticle() {}
@@ -139,6 +172,7 @@ int main() {
 
     switch (choice) {
     case 1: {
+        printNewsPercentage(trueNews, fakeNews);
     }
     }
   }
