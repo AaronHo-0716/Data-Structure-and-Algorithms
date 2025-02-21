@@ -14,8 +14,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <sstream>
-#include <string>
-// #include <boost/algorithm/string.hpp>
+// #include <string>
 
 using namespace std;
 using namespace csv;
@@ -28,6 +27,12 @@ struct myArray {
             return (Date(d));
         }
 
+        string trim(string str) {
+            str.erase(0, str.find_first_not_of(" \t\n\r"));
+            str.erase(str.find_last_not_of(" \t\n\r") + 1);  
+            return str;
+        }
+
     public: 
         string title, text, category;
         Date publicationDate;
@@ -35,8 +40,7 @@ struct myArray {
         myArray() : title(""), text(""), category(""), publicationDate(Date("0000-00-00")) {}
 
         myArray(string c0, string c1, string c2, string c3)
-            : title(c0), text(c1), category(c2), publicationDate(parseDate(c3)) {}
-            // need to trim the empty space
+            : title(c0), text(c1), category(trim(c2)), publicationDate(parseDate(c3)) {}
 
         using ReturnType = variant<string, Date>;
         ReturnType operator[](int idx) const { 
