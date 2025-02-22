@@ -228,7 +228,8 @@ void quickSort(myArray* file, int low, int high, Compare comp) {
 int counter(myArray* file, int rowCount, int year, int month) {
     int count = 0;
     for (int i = 0; i < rowCount; i++) {
-        if (file[i].publicationDate.year == year && file[i].publicationDate.month == month) {
+        if (file[i].publicationDate.year == year && file[i].publicationDate.month == month && 
+            (file[i].category == "politicsNews" || file[i].category == "politics") ) {
             count++;
         }
     }
@@ -238,7 +239,8 @@ int counter(myArray* file, int rowCount, int year, int month) {
 int counter(myArray* file, int rowCount, int year) {
     int count = 0;
     for (int i = 0; i < rowCount; i++) {
-        if (file[i].publicationDate.year == year) {
+        if (file[i].publicationDate.year == year && 
+            (file[i].category == "politicsNews" || file[i].category == "politics")) {
             count++;
         }
     }
@@ -263,12 +265,16 @@ int getYearInput() {
 void printPercentageGraphic(myArray* trueN, myArray* fakeN, int trueRow, int fakeRow, int input) {
     float eachmonth[12], total = 0;
 
-    int fYear = counter(fakeN, fakeRow, input);
-    int tYear = counter(trueN, trueRow, input);
+    // int fYear = counter(fakeN, fakeRow, input);
+    // int tYear = counter(trueN, trueRow, input);
 
     for (int i = 0; i < 12; i++) {
+        // int f = counter(fakeN, fakeRow, input, i + 1);  
+        // eachmonth[i] = f / static_cast<float>(fYear + tYear) * 100;
         int f = counter(fakeN, fakeRow, input, i + 1);  
-        eachmonth[i] = f / static_cast<float>(fYear + tYear) * 100;
+        int t = counter(trueN, trueRow, input, i + 1);  
+        eachmonth[i] = (f == 0 || t == 0) ? 0 : f / static_cast<float>(f + t) * 100;
+
         total += eachmonth[i];
     }
 
@@ -285,7 +291,7 @@ void printPercentageGraphic(myArray* trueN, myArray* fakeN, int trueRow, int fak
             << right << setw(6)  
             << fixed << setprecision(2) << eachmonth[i] << "%" << endl;
     }
-    cout << "Total Fake News percentage in Year " << input << " is " << total << "%." << endl;
+    cout << "Total Fake News percentage in Year " << input << " is " << total / 12 << "%." << endl;
     cout << "Note: Each '*' represents 1% of fake news.\n";
 }
 
@@ -566,18 +572,6 @@ int main() {
     myArray* fakeN = readFile("fake.csv", fakeNrowCount);
     myArray* trueN = readFile("true.csv", trueNrowCount);
     auto stop = high_resolution_clock::now();
-
-    // read and print line & time taken
-    // cout << "Time taken to read from the csv file (ms): " << (duration_cast<milliseconds>(stop - start)).count() << endl;
-
-    // mergeSort(fakeN, 0, fakeNrowCOunt - 1, compareMyArray);
-    // readArray(fakeN, fakeNrowCOunt);
-
-    // NewsPercentageMenu(trueN, fakeN, trueNrowCount, trueNrowCount);
-    // 
-    // mostFrequentWord(fakeN, fakeNrowCount);
-
-    // searchArticleMenu(fakeN, fakeNrowCount);
 
     menu(trueN, fakeN, trueNrowCount, fakeNrowCount);
 
