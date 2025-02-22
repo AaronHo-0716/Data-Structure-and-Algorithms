@@ -228,11 +228,11 @@ void NewsPercentageMenu(myArray* trueN, myArray* fakeN, int trueRow, int fakeRow
     int input = -1, year = 2015;
 
     while (true) {
-        cout << "Do you want to apply any filter?\n"
+        cout << "\nDo you want to apply any filter?\n"
                 << "1. Year\n"
                 << "2. No Filter (All Years)\n"
                 << "0. Exit\n"
-                << ": ";
+                << "Please enter yuor choice: ";
 
         if (!(cin >> input) || input < 0 || input > 2) {
             cout << "Invalid input. Please enter a valid option (0, 1, or 2).\n";
@@ -252,7 +252,7 @@ void NewsPercentageMenu(myArray* trueN, myArray* fakeN, int trueRow, int fakeRow
             default:
                 return;  // Exit the function if 0 is entered
         }
-        // break;
+        break;
     }
 }
 
@@ -298,7 +298,7 @@ void mostFrequentWord(myArray* file, int rowCount) {
 
     mergeSort(wordFreq, 0, uniqueCount - 1, compareWordFrequency); 
 
-    cout << "Top 20 Most Frequent Words in Government topics:\n";
+    cout << "\nTop 20 Most Frequent Words in Government topics:\n";
     for (int i = 0; i < min(20, uniqueCount); i++) {
         cout << i + 1 << ". " << wordFreq[i].word << " (Count: " << wordFreq[i].frequency << ")\n";
     }
@@ -312,7 +312,7 @@ void mostFrequentWord(myArray* file, int rowCount) {
 char fakeORtrue() {
     while (1) {
         int choice = 0;
-        cout << "You want to serach/sort in\n" 
+        cout << "\nYou want to serach/sort in\n" 
             << "1. Fake Mews\n"
             << "2. True News\n"
             << "3. Exit\n"
@@ -336,12 +336,12 @@ char fakeORtrue() {
 void sortArticle(myArray* file, int rowCount) {
     while(1) {
         int choice = 0;
-        cout << "Sort articles:" << endl;
+        cout << "\nSort articles:" << endl;
         cout << "1. Merge Sort" << endl;
         cout << "2. Bubble Sort" << endl;
         cout << "3. Without Sorting" << endl;
         cout << "4. Exit" << endl;
-        cout << ": ";
+        cout << "Please enter your choice: ";
 
         if (!(cin >> choice) || choice < 1 || choice > 4) {
             cout << "Invalid input. Please enter a valid number from 1 - 4." << endl;
@@ -370,7 +370,7 @@ string getInput() {
     string input;
 
     while (true) {
-        cout << "Article Available: \n"
+        cout << "\nArticle Available: \n"
             << "Middle-east\n"
             << "US_News\n"
             << "left-news\n" 
@@ -379,15 +379,16 @@ string getInput() {
             << "News\n" 
             << "politicsNews\n"
             << "worldnews\n"
+            << "Exit\n"
             << "Enter article subject: ";
 
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore leftover input
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore leftover input
 
-            if (!getline(cin, input) || input.empty()) {  // Checks if input is empty
-                cout << "Invalid input. Please enter a valid subject.\n";
-                continue;
-            }
+        if (!getline(cin, input) || input.empty()) {  // Checks if input is empty
+            cout << "Invalid input. Please enter a valid subject.\n";
+            continue;
+        }
         transform(input.begin(), input.end(), input.begin(), ::tolower); 
         return input;
     }
@@ -402,6 +403,7 @@ void searchArticle(myArray* file, int rowCount, bool byYear) {
         year = getYearInput();
     } else {
         subject = getInput();
+        if (subject == "exit") return;
         transform(subject.begin(), subject.end(), subject.begin(), ::tolower); 
     }
 
@@ -423,7 +425,7 @@ void searchArticle(myArray* file, int rowCount, bool byYear) {
 void searchArticleMenu(myArray* file, int rowCount) {
     while (1) {
         int choice = 0;
-        cout << "Please choose one option: " << endl;
+        cout << "\nPlease choose one option: " << endl;
         cout << "1. Search Article by Year." << endl;
         cout << "2. Search Article by Subject." << endl;
         cout << "3. Exit" << endl;
@@ -442,7 +444,7 @@ void searchArticleMenu(myArray* file, int rowCount) {
             default: break;
         }
         
-        if (choice == 3) break;
+        break;
     }
 }
 
@@ -450,7 +452,7 @@ void menu(myArray* trueN, myArray* fakeN, int trueRow, int fakeRow) {
     char fORt;
     while (1) {
         int choice = 0;
-        cout << "Please choose one option: " << endl;
+        cout << "\nPlease choose one option: " << endl;
         cout << "1. Percentage of fake news per year." << endl;
         cout << "2. Sort the news article by year." << endl;
         cout << "3. Most frequent words in goverment fake news." << endl;
