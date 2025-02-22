@@ -110,6 +110,8 @@ void readArray(myArray* file, int rowCount) {
             }
         }
     }
+    // cout << "Total Fake Articles: " << fakeNrowCount << endl; // 23481
+    // cout << "Total True Articles: " << trueNrowCount << endl; // 21417
 }
 
 // merge Sort
@@ -262,6 +264,8 @@ void mostFrequentWord(myArray* file, int rowCount) {
     int uniqueCount = 0;
     string w;
 
+    auto start = high_resolution_clock::now();
+
     for (int i = 0; i < rowCount; i++) {
         if (file[i].category == "Government News") {
             string text = file[i].title;
@@ -299,31 +303,66 @@ void mostFrequentWord(myArray* file, int rowCount) {
         cout << i + 1 << ". " << wordFreq[i].word << " (Count: " << wordFreq[i].frequency << ")\n";
     }
 
+    auto stop = high_resolution_clock::now();
+    cout << "Time Duration: " << (duration_cast<milliseconds>(stop - start)).count() << "ms" << endl;
+
     delete[] wordFreq;
 }
 
-void sortArticle() {
-    while(1) {
+char fakeORtrue() {
+    while (1) {
         int choice = 0;
-        cout << "Sort articles:" << endl;
-        cout << "1. Merge Sort" << endl;
-        cout << "2. Bubble Sort" << endl;
-        cout << "3. Without Sorting" << endl;
-        cout << ": ";
+        cout << "You want to serach/sort in\n" 
+            << "1. Fake Mews\n"
+            << "2. True News\n"
+            << "3. Exit\n"
+            << "Please enter: ";
 
-        if (!(cin >> choice) || choice < 0 || choice > 3) {
-            cout << "Invalid input. Please enter a valid number from 1 - 5." << endl;
+        if (!(cin >> choice) || choice < 1 || choice > 3) {
+            cout << "Invalid input. Please enter a valid number from 1 - 3." << endl;
             cin.clear(); 
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
             continue;
         }
 
         switch (choice) {
-            // case 1: mergeSort(); break;
-            // case 2: (); break;
-            // case 3: (); break;
+            case 1: return 'F';
+            case 2: return 'T';
+            default: return '-';
+        }
+    }
+}
+
+void sortArticle(myArray* file, int rowCount) {
+    while(1) {
+        int choice = 0;
+        cout << "Sort articles:" << endl;
+        cout << "1. Merge Sort" << endl;
+        cout << "2. Bubble Sort" << endl;
+        cout << "3. Without Sorting" << endl;
+        cout << "4. Exit" << endl;
+        cout << ": ";
+
+        if (!(cin >> choice) || choice < 1 || choice > 4) {
+            cout << "Invalid input. Please enter a valid number from 1 - 4." << endl;
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            continue;
+        }
+        
+        auto start = high_resolution_clock::now();
+        switch (choice) {
+            case 1: mergeSort(file, 0, rowCount - 1, compareMyArray); break;
+            // case 2: (); break; 
             default: break;
         }
+        if (choice != 4) {
+            readArray(file, rowCount);
+            auto stop = high_resolution_clock::now();
+            cout << "Time Duration: " << (duration_cast<milliseconds>(stop - start)).count() << "ms" << endl;
+        }
+
+        break;
     }
 }
 
@@ -334,13 +373,16 @@ string getInput() {
         cout << "Article Available: \n"
             << "Middle-east\n"
             << "US_News\n"
-            << "left-news\n" // got
+            << "left-news\n" 
             << "Government News\n"
-            << "politics\n" // got
+            << "politics\n" 
             << "News\n" 
             << "politicsNews\n"
             << "worldnews\n"
             << "Enter article subject: ";
+
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore leftover input
 
             if (!getline(cin, input) || input.empty()) {  // Checks if input is empty
                 cout << "Invalid input. Please enter a valid subject.\n";
@@ -363,15 +405,18 @@ void searchArticle(myArray* file, int rowCount, bool byYear) {
         transform(subject.begin(), subject.end(), subject.begin(), ::tolower); 
     }
 
+    auto start = high_resolution_clock::now();
     for (int i = 0; i < rowCount; i++) {
         string temp = file[i].category;
         transform(temp.begin(), temp.end(), temp.begin(), ::tolower); 
 
         if (file[i].publicationDate.year == year || temp == subject) {
             cout << count++ << ": " << file[i].title << file[i].category << (file[i].publicationDate).getDate() << endl;
-        }
-    
+        }    
     }
+    auto stop = high_resolution_clock::now();
+    cout << "Time Duration: " << (duration_cast<milliseconds>(stop - start)).count() << "ms" << endl;
+    cout << "Total Article Found: " << count << endl;
 }
 
 // 6.	Search the articles based on specific criteria, such as category, publication year
@@ -384,7 +429,7 @@ void searchArticleMenu(myArray* file, int rowCount) {
         cout << "3. Exit" << endl;
         cout << ": ";
 
-        if (!(cin >> choice) || choice < 0 || choice > 4) {
+        if (!(cin >> choice) || choice < 1 || choice > 3) {
             cout << "Invalid input. Please enter a valid number from 1 - 3." << endl;
             cin.clear(); 
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
@@ -396,10 +441,13 @@ void searchArticleMenu(myArray* file, int rowCount) {
             case 2: searchArticle(file, rowCount, false); break; // bubble sort
             default: break;
         }
+        
+        if (choice == 3) break;
     }
 }
 
-void menu() {
+void menu(myArray* trueN, myArray* fakeN, int trueRow, int fakeRow) {
+    char fORt;
     while (1) {
         int choice = 0;
         cout << "Please choose one option: " << endl;
@@ -410,41 +458,43 @@ void menu() {
         cout << "5. Exit" << endl;
         cout << ": ";
 
-        if (!(cin >> choice) || choice < 0 || choice > 6) {
+        if (!(cin >> choice) || choice < 1 || choice > 5) {
             cout << "Invalid input. Please enter a valid number from 1 - 5." << endl;
             cin.clear(); 
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
             continue;
         }
 
-        auto start = high_resolution_clock::now();
         switch (choice) {
-            // case 1: printNewsPercentage(); break;
-            // case 2: sortArticle(); break; // bubble sort
-            // case 3: mostFrequentWord(); break;
-            // case 4: searchArticle(); break;
-            case 5: break;
+            case 1: NewsPercentageMenu(trueN, fakeN, trueRow, fakeRow); break;
+            case 2: 
+                fORt = fakeORtrue();
+                if (fORt == 'F') sortArticle(fakeN, fakeRow); 
+                else if (fORt == 'T') sortArticle(trueN, trueRow); 
+                break;
+            case 3: mostFrequentWord(fakeN, fakeRow); break;
+            case 4: 
+                fORt = fakeORtrue();
+                if (fORt == 'F') searchArticleMenu(fakeN, fakeRow); 
+                else if (fORt == 'T') searchArticleMenu(trueN, trueRow); 
+                break;
             default: break;
         }
-        auto stop = high_resolution_clock::now();
-        // cout << "Fake: " << (duration_cast<milliseconds>(stop - start)).count() << "ms" << endl;
 
+        if (choice == 5) break;
     }
 }
 
 
 int main() {
-    int trueNrowCount, fakeNrowCount, testNrowCount;
+    int trueNrowCount, fakeNrowCount;
     
     auto start = high_resolution_clock::now();
     myArray* fakeN = readFile("fake.csv", fakeNrowCount);
     myArray* trueN = readFile("true.csv", trueNrowCount);
-    myArray* testN = readFile("test.csv", testNrowCount);
     auto stop = high_resolution_clock::now();
 
     // read and print line & time taken
-    // cout << "Total Fake Articles: " << fakeNrowCount << endl; // 23481
-    // cout << "Total True Articles: " << trueNrowCount << endl; // 21417
     // cout << "Time taken to read from the csv file (ms): " << (duration_cast<milliseconds>(stop - start)).count() << endl;
 
     // mergeSort(fakeN, 0, fakeNrowCOunt - 1, compareMyArray);
@@ -454,15 +504,12 @@ int main() {
     // 
     // mostFrequentWord(fakeN, fakeNrowCount);
 
-    searchArticleMenu(fakeN, fakeNrowCount);
+    // searchArticleMenu(fakeN, fakeNrowCount);
+
+    menu(trueN, fakeN, trueNrowCount, fakeNrowCount);
 
     delete[] trueN; // Free allocated memory
     delete[] fakeN; // Free allocated memory
-    delete[] testN; // Free allocated memory
 
     return 0;
 }
-
-    // search article based on (display)
-        // - year
-        // - subject
