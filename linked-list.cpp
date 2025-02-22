@@ -1,6 +1,8 @@
 #include "csv.hpp"
 #include "date.h"
 #include <chrono>
+#include <cmath>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
@@ -77,7 +79,9 @@ struct News {
       cout << "News is empty" << endl;
     } else {
       while (current != nullptr) {
-        if (current->date.month == month && current->date.year == year) {
+        if (current->date.month == month && current->date.year == year &&
+            (current->category == "politicsNews" ||
+             current->category == "politics")) {
           counter++;
         }
         current = current->next;
@@ -90,26 +94,67 @@ struct News {
 
 void printNewsPercentage(News trueNews, News fakeNews) {
   int filterYear;
-  int trueNewsPerMonth[12] = {};
-  int fakeNewsPerMonth[12] = {};
+  string months[12] = {"January",   "February", "March",    "April",
+                       "May",       "June",     "July",     "August",
+                       "September", "October",  "November", "December"};
+  float percentageOfFakeNews[12] = {};
 
-  cout << "Welcome to Percentage of Fake Politcal News Article" << endl;
-  cout << "Please enter the year you want to search: ", cin >> filterYear;
+  cout << "Welcome to Percentage of Fake Political News Articles" << endl;
+  while (true) {
+    cout << "Please enter the year you want to search (Type 0 to quit): ";
+    cin >> filterYear;
 
-  for(int i = 0; i < 12; i++) {
-    trueNewsPerMonth[i] = trueNews.newsPerMonthByYear(i + 1, filterYear);
-    fakeNewsPerMonth[i] = fakeNews.newsPerMonthByYear(i + 1, filterYear);
-  }
-  for(int i = 0; i < 12; i++) {
-    cout << i << endl;
-    cout << "True news: " << trueNewsPerMonth[i] << endl;
-    cout << "Fake news: "<< fakeNewsPerMonth[i] << endl;
+    if (filterYear == 0) {
+      break;
+    }
+
+    for (int i = 0; i < 12; i++) {
+      int trueCount = trueNews.newsPerMonthByYear(i + 1, filterYear);
+      int fakeCount = fakeNews.newsPerMonthByYear(i + 1, filterYear);
+
+      if (trueCount + fakeCount == 0) {
+        percentageOfFakeNews[i] = 0; // Avoid division by zero
+      } else {
+        percentageOfFakeNews[i] =
+            (static_cast<float>(fakeCount) / (trueCount + fakeCount)) * 100;
+      }
+    }
+
+    cout << "\nPercentage of Fake Political News Articles in " << filterYear
+         << "\n";
+    cout << "---------------------------------------------------------\n";
+    cout << left << setw(12) << "Month" << " | " << setw(20) << "Graph" << " | "
+         << "Percentage\n";
+    cout << "---------------------------------------------------------\n";
+
+    for (int i = 0; i < 12; i++) {
+      cout << left << setw(12) << months[i] << " | "; // Align month names
+      int stars = static_cast<int>(
+          percentageOfFakeNews[i]); // Convert percentage to integer for stars
+      for (int j = 0; j < stars; j++) {
+        cout << "*";
+      }
+      cout << setw(20 - stars) << "" << " | " << fixed << setprecision(2)
+           << setw(6) << percentageOfFakeNews[i] << "%" << endl;
+    }
   }
 }
 void sortArticle() {
-  cout << "Sort articles:" << endl;
-  cout << "1. Merge Sort" << endl;
-  cout << "2. Bubble Sort" << endl;
+  while (true) {
+    int choice = 0;
+    cout << "Sort articles:" << endl;
+    cout << "1. Merge Sort" << endl;
+    cout << "2. Bubble Sort" << endl;
+    cout << "3. Quit" << endl;
+
+    cin >> choice;
+
+    if (choice == 1) {
+    } else if (choice == 2) {
+    } else if (choice == 3) {
+      break;
+    }
+  }
 }
 void mostFrequentWord() {}
 void searchArticle() {}
@@ -168,12 +213,17 @@ int main() {
     cout << "2. Sort the news article by year." << endl;
     cout << "3. Most frequent words in goverment fake news." << endl;
     cout << "4. Search article." << endl;
-    cout << "5. Exit: ", cin >> choice;
+    cout << "5. Exit " << endl;
+    cin >> choice;
 
-    switch (choice) {
-    case 1: {
-        printNewsPercentage(trueNews, fakeNews);
-    }
+    if (choice == 1) {
+      printNewsPercentage(trueNews, fakeNews);
+    } else if (choice == 2) {
+      sortArticle();
+    } else if (choice == 3) {
+    } else if (choice == 4) {
+    } else if (choice == 5) {
+      break;
     }
   }
 }
