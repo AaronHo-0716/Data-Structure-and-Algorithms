@@ -163,6 +163,25 @@ void mergeSort(T* file, int left, int right, Compare comp) {
     }
 }
 
+// bubble sort
+template <typename Compare>
+void bubbleSort(myArray* file, int rowCount, Compare comp) {
+    bool swapped;
+
+    for (int i = 0; i < (rowCount - 1); i++) {
+        swapped = false;
+        for (int j = 0; j < (rowCount - 1 - i); j++) {
+            if (comp(file[j + 1], file[j])) {
+                swap(file[j], file[j + 1]);
+                swapped = true;
+            }
+        }
+        // If no two elements were swapped, then break
+        if (!swapped)
+            break;
+    }
+}
+
 // percentage
 int counter(myArray* file, int rowCount, int year, int month) {
     int count = 0;
@@ -360,7 +379,7 @@ void sortArticle(myArray* file, int rowCount) {
         auto start = high_resolution_clock::now();
         switch (choice) {
             case 1: mergeSort(temp, 0, rowCount - 1, compareMyArray); break;
-            // case 2: (); break; 
+            case 2: bubbleSort(temp, rowCount, compareMyArray); break; 
             default: break;
         }
         if (choice != 4) {
