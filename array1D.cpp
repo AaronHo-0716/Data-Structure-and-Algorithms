@@ -182,6 +182,48 @@ void bubbleSort(myArray* file, int rowCount, Compare comp) {
     }
 }
 
+template <typename Compare>
+int partition(myArray* file, int low, int high, Compare comp) {
+
+    // Selecting last element as the pivot
+    myArray pivot = file[high];
+
+    // Index of elemment just before the last element
+    // It is used for swapping
+    int i = (low - 1);
+
+    for (int j = low; j <= high - 1; j++) {
+
+        // If current element is smaller than or
+        // equal to pivot
+        if (comp(file[j], pivot)) {
+            i++;
+            swap(file[i], file[j]);
+        }
+    }
+
+    // Put pivot to its position
+    swap(file[i + 1], file[high]);
+
+    // Return the point of partition
+    return (i + 1);
+}
+
+template <typename Compare>
+void quickSort(myArray* file, int low, int high, Compare comp) {
+    if (low < high) {
+
+        // pi is Partitioning Index, arr[p] is now at
+        // right place
+        int pi = partition(file, low, high, comp);
+
+        // Separately sort elements before and after the
+        // Partition Index pi
+        quickSort(file, low, pi - 1, comp);
+        quickSort(file, pi + 1, high, comp);
+    }
+}
+
 // percentage
 int counter(myArray* file, int rowCount, int year, int month) {
     int count = 0;
@@ -363,12 +405,13 @@ void sortArticle(myArray* file, int rowCount) {
         cout << "\nSort articles:" << endl;
         cout << "1. Merge Sort" << endl;
         cout << "2. Bubble Sort" << endl;
-        cout << "3. Without Sorting" << endl;
-        cout << "4. Exit" << endl;
+        cout << "3. Quick Sort" << endl;
+        cout << "4. Without Sorting" << endl;
+        cout << "5. Exit" << endl;
         cout << "Please enter your choice: ";
 
-        if (!(cin >> choice) || choice < 1 || choice > 4) {
-            cout << "Invalid input. Please enter a valid number from 1 - 4." << endl;
+        if (!(cin >> choice) || choice < 1 || choice > 5) {
+            cout << "Invalid input. Please enter a valid number from 1 - 5." << endl;
             cin.clear(); 
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
             continue;
@@ -380,9 +423,10 @@ void sortArticle(myArray* file, int rowCount) {
         switch (choice) {
             case 1: mergeSort(temp, 0, rowCount - 1, compareMyArray); break;
             case 2: bubbleSort(temp, rowCount, compareMyArray); break; 
+            case 3: quickSort(temp, 0, rowCount - 1, compareMyArray); break; 
             default: break;
         }
-        if (choice != 4) {
+        if (choice != 5) {
             readArray(temp, rowCount);
             auto stop = high_resolution_clock::now();
             cout << "Time Duration: " << (duration_cast<milliseconds>(stop - start)).count() << "ms" << endl;
