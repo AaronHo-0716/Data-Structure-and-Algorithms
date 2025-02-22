@@ -84,6 +84,7 @@ myArray* readFile(string filename, int &rowCount) {
         return nullptr;
     }
 
+    auto start = high_resolution_clock::now();
     for (CSVRow &row : reader) {
         string data[4];
         int colIdx = 0;
@@ -97,6 +98,12 @@ myArray* readFile(string filename, int &rowCount) {
         rowCount++;
     }
 
+    cout << "Total " << ((filename == "true.csv") ? "True" : "Fake") << " Articles: " << rowCount + 1 << endl;
+    auto stop = high_resolution_clock::now();
+    cout << "Time Duration: " << (duration_cast<milliseconds>(stop - start)).count() << "ms" << endl;
+    // cout << "Total Fake Articles: " << fakeNrowCount << endl; // 23481
+    // cout << "Total True Articles: " << trueNrowCount << endl; // 21417
+
     return file;
 }
 
@@ -106,12 +113,10 @@ void readArray(myArray* file, int rowCount) {
         for (int j = 0; j < 4; j++) {
             if (j != 1) {
                 data = (j == 3) ? get<Date>(file[i][j]).getDate() : get<string>(file[i][j]);
-                cout << data << endl;
+                cout << "line " << i + 1 << " col " << j << ": " << data << endl;
             }
         }
     }
-    // cout << "Total Fake Articles: " << fakeNrowCount << endl; // 23481
-    // cout << "Total True Articles: " << trueNrowCount << endl; // 21417
 }
 
 // merge Sort
@@ -349,19 +354,21 @@ void sortArticle(myArray* file, int rowCount) {
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
             continue;
         }
-        
+        myArray* temp = new myArray[rowCount];
+        for (int i = 0; i < rowCount; i++) temp[i] = file[i];
+
         auto start = high_resolution_clock::now();
         switch (choice) {
-            case 1: mergeSort(file, 0, rowCount - 1, compareMyArray); break;
+            case 1: mergeSort(temp, 0, rowCount - 1, compareMyArray); break;
             // case 2: (); break; 
             default: break;
         }
         if (choice != 4) {
-            readArray(file, rowCount);
+            readArray(temp, rowCount);
             auto stop = high_resolution_clock::now();
             cout << "Time Duration: " << (duration_cast<milliseconds>(stop - start)).count() << "ms" << endl;
         }
-
+        delete[] temp;
         break;
     }
 }
@@ -395,7 +402,7 @@ string getInput() {
 }
 
 void searchArticle(myArray* file, int rowCount, bool byYear) {
-    int count = 1;
+    int count = 0;
     int year = 2000;
     string subject = "";
 
@@ -413,8 +420,9 @@ void searchArticle(myArray* file, int rowCount, bool byYear) {
         transform(temp.begin(), temp.end(), temp.begin(), ::tolower); 
 
         if (file[i].publicationDate.year == year || temp == subject) {
-            cout << count++ << ": " << file[i].title << file[i].category << (file[i].publicationDate).getDate() << endl;
-        }    
+            count++;
+            cout << count << ": " << file[i].title << file[i].category << (file[i].publicationDate).getDate() << endl;
+        }
     }
     auto stop = high_resolution_clock::now();
     cout << "Time Duration: " << (duration_cast<milliseconds>(stop - start)).count() << "ms" << endl;
