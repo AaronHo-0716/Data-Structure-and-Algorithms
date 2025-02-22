@@ -90,6 +90,77 @@ struct News {
 
     return counter;
   }
+
+  Node *split(Node *head) {
+    Node *slow = head;
+    Node *fast = head;
+
+    while (fast->next && fast->next->next) {
+      slow = slow->next;
+      fast = fast->next->next;
+    }
+
+    Node *secondHalf = slow->next;
+    slow->next = nullptr;
+    if (secondHalf) {
+      secondHalf->prev = nullptr;
+    }
+    return secondHalf;
+  }
+
+  Node *merge(Node *first, Node *second) {
+    if (!first) {
+      return second;
+    }
+    if (!second) {
+      return first;
+    }
+
+    if (first->date.year <= second->date.year) {
+      first->next = merge(first->next, second);
+      if (first->next) {
+        first->next->prev = first;
+      }
+      first->prev = nullptr;
+      return first;
+    } else {
+      second->next = merge(first, second->next);
+      if (second->next) {
+        second->next->prev = second;
+      }
+      second->prev = nullptr;
+      return second;
+    }
+  }
+
+  void mergeSortByYear() {
+    if (!head || !head->next) {
+      return;
+    }
+
+    Node *second = split(head);
+
+    News left;
+    News right;
+    left.head = head;
+    right.head = second;
+
+    if (second) {
+      right.tail = tail;
+    } else {
+      left.tail = tail;
+    }
+
+    left.mergeSortByYear();
+    right.mergeSortByYear();
+
+    head = merge(left.head, right.head);
+
+    tail = head;
+    while (tail && tail->next) {
+      tail = tail->next;
+    }
+  }
 };
 
 void printNewsPercentage(News trueNews, News fakeNews) {
@@ -139,7 +210,7 @@ void printNewsPercentage(News trueNews, News fakeNews) {
     }
   }
 }
-void sortArticle() {
+void sortArticle(News trueNews, News fakeNews) {
   while (true) {
     int choice = 0;
     cout << "Sort articles:" << endl;
@@ -150,6 +221,24 @@ void sortArticle() {
     cin >> choice;
 
     if (choice == 1) {
+      cout << "Sorting true news and fake news now..." << endl;
+      auto startSortTrue = chrono::high_resolution_clock::now();
+      trueNews.mergeSortByYear();
+      auto endSortTrue = chrono::high_resolution_clock::now();
+
+      auto startSortFake = chrono::high_resolution_clock::now();
+      fakeNews.mergeSortByYear();
+      auto endSortFake = chrono::high_resolution_clock::now();
+
+      auto durationSortingTrue = chrono::duration_cast<chrono::milliseconds>(
+          endSortTrue - startSortTrue);
+      auto durationSortingFake = chrono::duration_cast<chrono::milliseconds>(
+          endSortFake - startSortFake);
+
+      cout << "True news and fake news sorted." << endl;
+      cout << "Time taken to sort true news: " << durationSortingTrue.count() << "ms" << endl;
+      cout << "Time taken to sort fake news: " << durationSortingFake.count() << "ms" << endl;
+
     } else if (choice == 2) {
     } else if (choice == 3) {
       break;
@@ -219,7 +308,7 @@ int main() {
     if (choice == 1) {
       printNewsPercentage(trueNews, fakeNews);
     } else if (choice == 2) {
-      sortArticle();
+      sortArticle(trueNews, fakeNews);
     } else if (choice == 3) {
     } else if (choice == 4) {
     } else if (choice == 5) {
