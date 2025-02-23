@@ -206,6 +206,7 @@ void bubbleSort(T* file, int rowCount, Compare comp) {
 //     swap(file[i + 1], file[high]);
 
 //     // Return the point of partition
+//     // partition result : Left < pivot, Right ≥ pivot
 //     return (i + 1);
 // }
 
@@ -230,13 +231,10 @@ int partition(News* file, int low, int high, Compare comp) {
 template <typename Compare>
 void quickSort(News* file, int low, int high, Compare comp) {
     if (low < high) {
-
-        // pi is Partitioning Index, arr[p] is now at
-        // right place
+        // (not necessarily pivot's final position)
         int pi = partition(file, low, high, comp);
 
-        // Separately sort elements before and after the
-        // Partition Index pi
+        // Recursively sort left and right partitions
         quickSort(file, low, pi, comp);
         quickSort(file, pi + 1, high, comp);
     }
