@@ -1,5 +1,5 @@
 #include "csv.hpp"
-#include "date.h"
+#include "date.hpp"
 #include <chrono>
 #include <cmath>
 #include <iomanip>
@@ -91,6 +91,89 @@ struct News {
     return counter;
   }
 
+  Node *getTail(Node *start) {
+    Node *current = start;
+    while (current && current->next) {
+      current = current->next;
+    }
+    return current;
+  }
+
+  Node *partition(Node *start, Node *end, Node *&newHead, Node *&newTail) {
+    Node *pivot = end;
+    Node *prev = nullptr;
+    Node *current = start;
+    Node *tail = pivot;
+
+    while (current != pivot) {
+      if (current->date.year <= pivot->date.year) {
+        if (!newHead) {
+          newHead = current;
+        }
+        prev = current;
+        current = current->next;
+      } else {
+        Node *temp = current->next;
+        if (prev)
+          prev->next = temp;
+        if (temp)
+          temp->prev = prev;
+
+        current->prev = tail;
+        tail->next = current;
+        current->next = nullptr;
+        tail = current;
+
+        current = temp;
+        if (!current && prev)
+          current = prev->next;
+      }
+    }
+
+    if (!newHead) {
+      newHead = pivot;
+    }
+
+    newTail = tail;
+
+    return prev;
+  }
+
+  void quickSortHelper(Node *start, Node *end) {
+    if (!start || start == end || !end || start == end->next) {
+      return;
+    }
+
+    Node *newHead = nullptr;
+    Node *newTail = nullptr;
+
+    Node *pivotPrev = partition(start, end, newHead, newTail);
+    Node *pivot = end;
+
+    if (!pivotPrev) {
+      quickSortHelper(pivot->next, newTail);
+    } else {
+      pivotPrev->next = nullptr;
+      if (pivot)
+        pivot->prev = nullptr;
+
+      quickSortHelper(newHead, pivotPrev);
+      quickSortHelper(pivot->next, newTail);
+    }
+
+    Node *temp = getTail(newHead);
+    if (temp && temp != pivot) {
+      temp->next = pivot;
+      pivot->prev = temp;
+    }
+  }
+  void quickSortByYear() {
+    if (!head || !head->next)
+      return;
+    quickSortHelper(head, getTail(head));
+    tail = getTail(head);
+  }
+
   Node *split(Node *head) {
     Node *slow = head;
     Node *fast = head;
@@ -163,7 +246,6 @@ struct News {
   }
 
   void bubbleSortByYear() {
-    // Base case
     if (!head || !head->next) {
       return;
     }
@@ -219,6 +301,28 @@ struct News {
   }
 };
 
+void printNewsAfterSorting(News trueNews, News fakeNews) {
+  while (true) {
+    int choice = 0;
+    cout << "Choose which to print: " << endl;
+    cout << "1. True News" << endl;
+    cout << "2. Fake News" << endl;
+    cout << "3. Quit" << endl;
+
+    cin >> choice;
+
+    if (choice == 1) {
+      trueNews.traverse();
+    } else if (choice == 2) {
+      fakeNews.traverse();
+    } else if (choice == 3) {
+      break;
+    } else {
+      cout << "Invalid option, please choose again." << endl;
+    }
+  }
+}
+
 void printNewsPercentage(News trueNews, News fakeNews) {
   int filterYear;
   string months[12] = {"January",   "February", "March",    "April",
@@ -228,7 +332,7 @@ void printNewsPercentage(News trueNews, News fakeNews) {
 
   cout << "Welcome to Percentage of Fake Political News Articles" << endl;
   while (true) {
-    cout << "Please enter the year you want to search (Type 0 to quit): ";
+    cout << "Please enter the year you want to search (Type 0 ti quit): ";
     cin >> filterYear;
 
     if (filterYear == 0) {
@@ -275,7 +379,8 @@ void sortArticle(News trueNews, News fakeNews) {
     cout << "Sort articles:" << endl;
     cout << "1. Merge Sort" << endl;
     cout << "2. Bubble Sort" << endl;
-    cout << "3. Quit" << endl;
+    cout << "3. Quick Sort" << endl;
+    cout << "4. Quit" << endl;
 
     cin >> choice;
 
@@ -300,25 +405,7 @@ void sortArticle(News trueNews, News fakeNews) {
       cout << "Time taken to sort fake news: " << durationSortingFake.count()
            << "ms" << endl;
 
-      while (true) {
-        int choice = 0;
-        cout << "Choose which to print: " << endl;
-        cout << "1. True News" << endl;
-        cout << "2. Fake News" << endl;
-        cout << "3. Quit" << endl;
-
-        cin >> choice;
-
-        if (choice == 1) {
-          trueNews.traverse();
-        } else if (choice == 2) {
-          fakeNews.traverse();
-        } else if (choice == 3) {
-          break;
-        } else {
-          cout << "Invalid option, please choose again." << endl;
-        }
-      }
+      printNewsAfterSorting(trueNews, fakeNews);
 
     } else if (choice == 2) {
       cout << "Sorting true news and fake news now..." << endl;
@@ -341,27 +428,33 @@ void sortArticle(News trueNews, News fakeNews) {
       cout << "Time taken to sort fake news: " << durationSortingFake.count()
            << "ms" << endl;
 
-      while (true) {
-        int choice = 0;
-        cout << "Choose which to print: " << endl;
-        cout << "1. True News" << endl;
-        cout << "2. Fake News" << endl;
-        cout << "3. Quit" << endl;
-
-        cin >> choice;
-
-        if (choice == 1) {
-          trueNews.traverse();
-        } else if (choice == 2) {
-          fakeNews.traverse();
-        } else if (choice == 3) {
-          break;
-        } else {
-          cout << "Invalid option, please choose again." << endl;
-        }
-      }
+      printNewsAfterSorting(trueNews, fakeNews);
     } else if (choice == 3) {
+      cout << "Sorting true news and fake news now..." << endl;
+      auto startSortTrue = chrono::high_resolution_clock::now();
+      trueNews.quickSortByYear();
+      auto endSortTrue = chrono::high_resolution_clock::now();
+
+      auto startSortFake = chrono::high_resolution_clock::now();
+      fakeNews.quickSortByYear();
+      auto endSortFake = chrono::high_resolution_clock::now();
+
+      auto durationSortingTrue = chrono::duration_cast<chrono::milliseconds>(
+          endSortTrue - startSortTrue);
+      auto durationSortingFake = chrono::duration_cast<chrono::milliseconds>(
+          endSortFake - startSortFake);
+
+      cout << "True news and fake news sorted." << endl;
+      cout << "Time taken to sort true news: " << durationSortingTrue.count()
+           << "ms" << endl;
+      cout << "Time taken to sort fake news: " << durationSortingFake.count()
+           << "ms" << endl;
+
+      printNewsAfterSorting(trueNews, fakeNews);
+    } else if (choice == 4) {
       break;
+    } else {
+      cout << "Invalid option, please choose again." << endl;
     }
   }
 }
