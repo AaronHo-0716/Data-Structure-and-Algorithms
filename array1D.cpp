@@ -128,13 +128,13 @@ bool compareMyArray(const News& a, const News& b) {
     return tie(a.publicationDate.year, a.publicationDate.month, a.publicationDate.day) < tie(b.publicationDate.year, b.publicationDate.month, b.publicationDate.day);
 }
 
-template <typename T, typename Compare>
-void merge(T* file, int left, int mid, int right, Compare comp) {
+template <typename Compare>
+void merge(News* file, int left, int mid, int right, Compare comp) {
     int n1 = mid - left + 1;
     int n2 = right - mid;
 
-    T* Ltemp = new T[n1];
-    T* Rtemp = new T[n2];
+    News* Ltemp = new News[n1];
+    News* Rtemp = new News[n2];
 
     for (int i = 0; i < n1; i++) Ltemp[i] = file[left + i];
     for (int i = 0; i < n2; i++) Rtemp[i] = file[mid + 1 + i];
@@ -153,8 +153,8 @@ void merge(T* file, int left, int mid, int right, Compare comp) {
 }
 
 // **mergeSort function using a template**
-template <typename T, typename Compare>
-void mergeSort(T* file, int left, int right, Compare comp) {
+template <typename Compare>
+void mergeSort(News* file, int left, int right, Compare comp) {
     if (left < right) {
         int mid = left + (right - left) / 2;
         mergeSort(file, left, mid, comp);
@@ -164,8 +164,8 @@ void mergeSort(T* file, int left, int right, Compare comp) {
 }
 
 // bubble sort
-template <typename Compare>
-void bubbleSort(News* file, int rowCount, Compare comp) {
+template <typename T, typename Compare>
+void bubbleSort(T* file, int rowCount, Compare comp) {
     bool swapped;
 
     for (int i = 0; i < (rowCount - 1); i++) {
@@ -370,7 +370,7 @@ void mostFrequentWord(News* file, int rowCount) {
         }
     }
 
-    mergeSort(wordFreq, 0, uniqueCount - 1, compareWordFrequency); 
+    bubbleSort(wordFreq, uniqueCount, compareWordFrequency); 
 
     cout << "\nTop 20 Most Frequent Words in Government topics:\n";
     for (int i = 0; i < min(20, uniqueCount); i++) {
