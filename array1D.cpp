@@ -182,31 +182,49 @@ void bubbleSort(T* file, int rowCount, Compare comp) {
     }
 }
 
+// template <typename Compare>
+// int partition(News* file, int low, int high, Compare comp) {
+//     // 	Lomuto Partition = Last element as pivot (arr[high])
+//     // Selecting last element as the pivot
+//     News pivot = file[high];
+
+//     // Index of elemment just before the last element
+//     // It is used for swapping
+//     int i = (low - 1);
+
+//     for (int j = low; j <= high - 1; j++) {
+
+//         // If current element is smaller than or
+//         // equal to pivot
+//         if (comp(file[j], pivot)) {
+//             i++;
+//             swap(file[i], file[j]);
+//         }
+//     }
+
+//     // Put pivot to its position
+//     swap(file[i + 1], file[high]);
+
+//     // Return the point of partition
+//     return (i + 1);
+// }
+
 template <typename Compare>
 int partition(News* file, int low, int high, Compare comp) {
+    // 	Hoare’s Partition = First element as pivot (arr[low])
+    News pivot = file[low];
 
-    // Selecting last element as the pivot
-    News pivot = file[high];
+    int i = low - 1; 
+    int j = high + 1;
 
-    // Index of elemment just before the last element
-    // It is used for swapping
-    int i = (low - 1);
+    while (true) {
+        do {i++;} while (i < high && comp(file[i], pivot)); // find next element larger than pivot from the left
+        do {j--;} while (j > low && comp(pivot, file[j])); // find next element smaller than pivot from the right
 
-    for (int j = low; j <= high - 1; j++) {
+        if (i >= j) return j; // if left and right crosses each other
 
-        // If current element is smaller than or
-        // equal to pivot
-        if (comp(file[j], pivot)) {
-            i++;
-            swap(file[i], file[j]);
-        }
+        swap(file[i], file[j]); // swap larger and smaller elements
     }
-
-    // Put pivot to its position
-    swap(file[i + 1], file[high]);
-
-    // Return the point of partition
-    return (i + 1);
 }
 
 template <typename Compare>
@@ -219,7 +237,7 @@ void quickSort(News* file, int low, int high, Compare comp) {
 
         // Separately sort elements before and after the
         // Partition Index pi
-        quickSort(file, low, pi - 1, comp);
+        quickSort(file, low, pi, comp);
         quickSort(file, pi + 1, high, comp);
     }
 }
@@ -431,7 +449,7 @@ void sortArticle(News* file, int rowCount) {
         cout << "\nSort articles:" << endl;
         cout << "1. Merge Sort" << endl;
         cout << "2. Bubble Sort" << endl;
-        cout << "3. Quick Sort" << endl;
+        cout << "3. Quick Sort (Hoare's Partition)" << endl;
         cout << "4. Without Sorting" << endl;
         cout << "5. Exit" << endl;
         cout << "Please enter your choice: ";
