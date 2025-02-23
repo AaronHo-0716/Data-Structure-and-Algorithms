@@ -7,7 +7,7 @@
 // boost::trim function
 
 #include "csv.hpp"
-#include "date.h"
+#include "date.hpp"
 #include <iostream>
 #include <chrono>
 #include <variant>
