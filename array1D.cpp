@@ -510,7 +510,7 @@ void searchArticle(myArray* file, int rowCount, bool byYear) {
 
         if (file[i].publicationDate.year == year || temp == subject) {
             count++;
-            cout << count << ": " << file[i].title << file[i].category << (file[i].publicationDate).getDate() << endl;
+            cout << "[line " << count << "] title: " << file[i].title << " | category: " << file[i].category << " | Date: " << (file[i].publicationDate).getDate() << endl;
         }
     }
     auto stop = high_resolution_clock::now();
