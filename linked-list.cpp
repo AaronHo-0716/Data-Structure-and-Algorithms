@@ -161,6 +161,62 @@ struct News {
       tail = tail->next;
     }
   }
+
+  void bubbleSortByYear() {
+    // Base case
+    if (!head || !head->next) {
+      return;
+    }
+
+    bool swapped;
+    Node *current;
+    Node *lastSorted = nullptr;
+
+    do {
+      swapped = false;
+      current = head;
+
+      // Traverse until the end or the last sorted node
+      while (current->next != lastSorted) {
+        if (current->date.year > current->next->date.year) {
+          // Swap nodes
+          Node *tempNext = current->next;
+
+          current->next = tempNext->next;
+          tempNext->next = current;
+
+          tempNext->prev = current->prev;
+          current->prev = tempNext;
+
+          if (tempNext->prev == nullptr) {
+            head = tempNext;
+          } else {
+            tempNext->prev->next = tempNext;
+          }
+
+          if (current->next) {
+            current->next->prev = current;
+          }
+
+          // Update tail if the swap involves the last node
+          if (current == tail) {
+            tail = tempNext;
+          }
+
+          swapped = true;
+
+          current = tempNext;
+        }
+
+        current = current->next;
+        if (!current) {
+          break;
+        }
+      }
+
+      lastSorted = current;
+    } while (swapped);
+  }
 };
 
 void printNewsPercentage(News trueNews, News fakeNews) {
@@ -213,6 +269,9 @@ void printNewsPercentage(News trueNews, News fakeNews) {
 void sortArticle(News trueNews, News fakeNews) {
   while (true) {
     int choice = 0;
+    cout << "Remember to close the program and open again if you have already "
+            "sorted the articles."
+         << endl;
     cout << "Sort articles:" << endl;
     cout << "1. Merge Sort" << endl;
     cout << "2. Bubble Sort" << endl;
@@ -236,10 +295,71 @@ void sortArticle(News trueNews, News fakeNews) {
           endSortFake - startSortFake);
 
       cout << "True news and fake news sorted." << endl;
-      cout << "Time taken to sort true news: " << durationSortingTrue.count() << "ms" << endl;
-      cout << "Time taken to sort fake news: " << durationSortingFake.count() << "ms" << endl;
+      cout << "Time taken to sort true news: " << durationSortingTrue.count()
+           << "ms" << endl;
+      cout << "Time taken to sort fake news: " << durationSortingFake.count()
+           << "ms" << endl;
+
+      while (true) {
+        int choice = 0;
+        cout << "Choose which to print: " << endl;
+        cout << "1. True News" << endl;
+        cout << "2. Fake News" << endl;
+        cout << "3. Quit" << endl;
+
+        cin >> choice;
+
+        if (choice == 1) {
+          trueNews.traverse();
+        } else if (choice == 2) {
+          fakeNews.traverse();
+        } else if (choice == 3) {
+          break;
+        } else {
+          cout << "Invalid option, please choose again." << endl;
+        }
+      }
 
     } else if (choice == 2) {
+      cout << "Sorting true news and fake news now..." << endl;
+      auto startSortTrue = chrono::high_resolution_clock::now();
+      trueNews.bubbleSortByYear();
+      auto endSortTrue = chrono::high_resolution_clock::now();
+
+      auto startSortFake = chrono::high_resolution_clock::now();
+      fakeNews.bubbleSortByYear();
+      auto endSortFake = chrono::high_resolution_clock::now();
+
+      auto durationSortingTrue = chrono::duration_cast<chrono::milliseconds>(
+          endSortTrue - startSortTrue);
+      auto durationSortingFake = chrono::duration_cast<chrono::milliseconds>(
+          endSortFake - startSortFake);
+
+      cout << "True news and fake news sorted." << endl;
+      cout << "Time taken to sort true news: " << durationSortingTrue.count()
+           << "ms" << endl;
+      cout << "Time taken to sort fake news: " << durationSortingFake.count()
+           << "ms" << endl;
+
+      while (true) {
+        int choice = 0;
+        cout << "Choose which to print: " << endl;
+        cout << "1. True News" << endl;
+        cout << "2. Fake News" << endl;
+        cout << "3. Quit" << endl;
+
+        cin >> choice;
+
+        if (choice == 1) {
+          trueNews.traverse();
+        } else if (choice == 2) {
+          fakeNews.traverse();
+        } else if (choice == 3) {
+          break;
+        } else {
+          cout << "Invalid option, please choose again." << endl;
+        }
+      }
     } else if (choice == 3) {
       break;
     }
