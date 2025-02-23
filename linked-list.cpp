@@ -99,45 +99,50 @@ struct News {
     return current;
   }
 
-  Node *partition(Node *start, Node *end, Node *&newHead, Node *&newTail) {
-    Node *pivot = end;
-    Node *prev = nullptr;
-    Node *current = start;
-    Node *tail = pivot;
+  Node* hoarePartition(Node* start, Node* end) {
+        int pivotYear = start->date.year;
+        Node* left = start;
+        Node* right = end;
 
-    while (current != pivot) {
-      if (current->date.year <= pivot->date.year) {
-        if (!newHead) {
-          newHead = current;
+        while (true) {
+            while (left && left->date.year < pivotYear) {
+                left = left->next;
+            }
+
+            while (right && right->date.year > pivotYear) {
+                right = right->prev;
+            }
+
+            if (left >= right || !left || !right || left == right->next) {
+                return right;
+            }
+
+            if (left != right) {
+                Node* leftPrev = left->prev;
+                Node* leftNext = left->next;
+                Node* rightPrev = right->prev;
+                Node* rightNext = right->next;
+
+                if (leftPrev) leftPrev->next = right;
+                if (leftNext) leftNext->prev = right;
+                left->prev = rightPrev;
+                left->next = rightNext;
+
+                if (rightPrev) rightPrev->next = left;
+                if (rightNext) rightNext->prev = left;
+                right->prev = leftPrev;
+                right->next = leftNext;
+
+                if (left == head) head = right;
+                if (right == head) head = left;
+                if (left == tail) tail = right;
+                if (right == tail) tail = left;
+
+                left = rightNext;
+                right = leftPrev;
+            }
         }
-        prev = current;
-        current = current->next;
-      } else {
-        Node *temp = current->next;
-        if (prev)
-          prev->next = temp;
-        if (temp)
-          temp->prev = prev;
-
-        current->prev = tail;
-        tail->next = current;
-        current->next = nullptr;
-        tail = current;
-
-        current = temp;
-        if (!current && prev)
-          current = prev->next;
-      }
     }
-
-    if (!newHead) {
-      newHead = pivot;
-    }
-
-    newTail = tail;
-
-    return prev;
-  }
 
   void quickSortHelper(Node *start, Node *end) {
     if (!start || start == end || !end || start == end->next) {
@@ -147,7 +152,7 @@ struct News {
     Node *newHead = nullptr;
     Node *newTail = nullptr;
 
-    Node *pivotPrev = partition(start, end, newHead, newTail);
+    Node *pivotPrev = hoarePartition(start, end);
     Node *pivot = end;
 
     if (!pivotPrev) {
@@ -167,6 +172,7 @@ struct News {
       pivot->prev = temp;
     }
   }
+
   void quickSortByYear() {
     if (!head || !head->next)
       return;
