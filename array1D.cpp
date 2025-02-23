@@ -236,16 +236,16 @@ int counter(myArray* file, int rowCount, int year, int month) {
     return count;
 }
 
-int counter(myArray* file, int rowCount, int year) {
-    int count = 0;
-    for (int i = 0; i < rowCount; i++) {
-        if (file[i].publicationDate.year == year && 
-            (file[i].category == "politicsNews" || file[i].category == "politics")) {
-            count++;
-        }
-    }
-    return count;
-}
+// int counter(myArray* file, int rowCount, int year) {
+//     int count = 0;
+//     for (int i = 0; i < rowCount; i++) {
+//         if (file[i].publicationDate.year == year && 
+//             (file[i].category == "politicsNews" || file[i].category == "politics")) {
+//             count++;
+//         }
+//     }
+//     return count;
+// }
 
 int getYearInput() {
     int input;
@@ -265,6 +265,8 @@ int getYearInput() {
 void printPercentageGraphic(myArray* trueN, myArray* fakeN, int trueRow, int fakeRow, int input) {
     float eachmonth[12], total = 0;
 
+    string reverseMonthMap[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+
     // int fYear = counter(fakeN, fakeRow, input);
     // int tYear = counter(trueN, trueRow, input);
 
@@ -278,10 +280,10 @@ void printPercentageGraphic(myArray* trueN, myArray* fakeN, int trueRow, int fak
         total += eachmonth[i];
     }
 
-    cout << "\nPercentage of Fake News in " << input << endl;
+    cout << "\nPercentage of Fake Politics News Articles in " << input << endl;
     for (int i = 0; i < 12; i++) {
         cout << left;
-        cout << setw(12) << Date().reverseMonthMap[i + 1] << ": ";  
+        cout << setw(12) << reverseMonthMap[i] << ": ";  
 
         cout << setw(2) << "" ;
         for (int j = 0; j < static_cast<int>(eachmonth[i]); j++) 
@@ -291,7 +293,7 @@ void printPercentageGraphic(myArray* trueN, myArray* fakeN, int trueRow, int fak
             << right << setw(6)  
             << fixed << setprecision(2) << eachmonth[i] << "%" << endl;
     }
-    cout << "Total Fake News percentage in Year " << input << " is " << total / 12 << "%." << endl;
+    cout << "Total Percentage of Fake Politics News Articles in Year " << input << " is " << total / 12 << "%." << endl;
     cout << "Note: Each '*' represents 1% of fake news.\n";
 }
 
@@ -405,6 +407,24 @@ char fakeORtrue() {
     }
 }
 
+bool promoptPrint() {
+    int choice = 0;
+    while (1) {
+        cout << "\nDo you want to print the sorted article\n"
+            << "1. Yes\n"
+            << "2. No\n"
+            << "Please enter: ";
+
+        if (!(cin >> choice) || choice < 1 || choice > 2) {
+            cout << "Invalid input. Please enter a valid number from 1 - 2." << endl;
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            continue;
+        }
+        return (choice == 1) ? true : false;
+    }
+}
+
 void sortArticle(myArray* file, int rowCount) {
     while(1) {
         int choice = 0;
@@ -433,9 +453,9 @@ void sortArticle(myArray* file, int rowCount) {
             default: break;
         }
         if (choice != 5) {
-            readArray(temp, rowCount);
             auto stop = high_resolution_clock::now();
             cout << "Time Duration: " << (duration_cast<milliseconds>(stop - start)).count() << "ms" << endl;
+            if (promoptPrint()) readArray(temp, rowCount);
         }
         delete[] temp;
         break;
