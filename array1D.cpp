@@ -21,7 +21,7 @@ using namespace csv;
 using namespace dateParsing;
 using namespace chrono;
 
-struct myArray {
+struct News {
     private:  
         Date parseDate(string d) {
             return (Date(d));
@@ -37,9 +37,9 @@ struct myArray {
         string title, text, category;
         Date publicationDate;
 
-        myArray() : title(""), text(""), category(""), publicationDate(Date("0000-00-00")) {}
+        News() : title(""), text(""), category(""), publicationDate(Date("0000-00-00")) {}
 
-        myArray(string c0, string c1, string c2, string c3)
+        News(string c0, string c1, string c2, string c3)
             : title(c0), text(c1), category(trim(c2)), publicationDate(parseDate(c3)) {}
 
         using ReturnType = variant<string, Date>;
@@ -73,11 +73,11 @@ struct WordFrequency {
     }
 };
 
-myArray* readFile(string filename, int &rowCount) {
+News* readFile(string filename, int &rowCount) {
     CSVReader reader(filename);
     rowCount = 0;
 
-    myArray* file = new myArray[23500]; 
+    News* file = new News[23500]; 
 
     if (!file) {
         cerr << "Memory allocation failed!" << endl;
@@ -94,7 +94,7 @@ myArray* readFile(string filename, int &rowCount) {
             colIdx++;
         }
 
-        file[rowCount] = myArray(data[0], data[1], data[2], data[3]);
+        file[rowCount] = News(data[0], data[1], data[2], data[3]);
         rowCount++;
     }
 
@@ -107,7 +107,7 @@ myArray* readFile(string filename, int &rowCount) {
     return file;
 }
 
-void readArray(myArray* file, int rowCount) {
+void readArray(News* file, int rowCount) {
     string data;
     for (int i = 0; i < rowCount; i++) {
         for (int j = 0; j < 4; j++) {
@@ -124,7 +124,7 @@ bool compareWordFrequency(const WordFrequency& a, const WordFrequency& b) {
     return a.frequency > b.frequency; // Descending order
 }
 
-bool compareMyArray(const myArray& a, const myArray& b) {
+bool compareMyArray(const News& a, const News& b) {
     return tie(a.publicationDate.year, a.publicationDate.month, a.publicationDate.day) < tie(b.publicationDate.year, b.publicationDate.month, b.publicationDate.day);
 }
 
@@ -165,7 +165,7 @@ void mergeSort(T* file, int left, int right, Compare comp) {
 
 // bubble sort
 template <typename Compare>
-void bubbleSort(myArray* file, int rowCount, Compare comp) {
+void bubbleSort(News* file, int rowCount, Compare comp) {
     bool swapped;
 
     for (int i = 0; i < (rowCount - 1); i++) {
@@ -183,10 +183,10 @@ void bubbleSort(myArray* file, int rowCount, Compare comp) {
 }
 
 template <typename Compare>
-int partition(myArray* file, int low, int high, Compare comp) {
+int partition(News* file, int low, int high, Compare comp) {
 
     // Selecting last element as the pivot
-    myArray pivot = file[high];
+    News pivot = file[high];
 
     // Index of elemment just before the last element
     // It is used for swapping
@@ -210,7 +210,7 @@ int partition(myArray* file, int low, int high, Compare comp) {
 }
 
 template <typename Compare>
-void quickSort(myArray* file, int low, int high, Compare comp) {
+void quickSort(News* file, int low, int high, Compare comp) {
     if (low < high) {
 
         // pi is Partitioning Index, arr[p] is now at
@@ -225,7 +225,7 @@ void quickSort(myArray* file, int low, int high, Compare comp) {
 }
 
 // percentage
-int counter(myArray* file, int rowCount, int year, int month) {
+int counter(News* file, int rowCount, int year, int month) {
     int count = 0;
     for (int i = 0; i < rowCount; i++) {
         if (file[i].publicationDate.year == year && file[i].publicationDate.month == month && 
@@ -262,7 +262,7 @@ int getYearInput() {
 }
 
 // Print percentage of fake news in graphical format
-void printPercentageGraphic(myArray* trueN, myArray* fakeN, int trueRow, int fakeRow, int input) {
+void printPercentageGraphic(News* trueN, News* fakeN, int trueRow, int fakeRow, int input) {
     float eachmonth[12], total = 0;
 
     string reverseMonthMap[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
@@ -298,7 +298,7 @@ void printPercentageGraphic(myArray* trueN, myArray* fakeN, int trueRow, int fak
 }
 
 // Menu for selecting news percentage filtering options
-void NewsPercentageMenu(myArray* trueN, myArray* fakeN, int trueRow, int fakeRow) {
+void NewsPercentageMenu(News* trueN, News* fakeN, int trueRow, int fakeRow) {
     int input = -1, year = 2015;
 
     while (true) {
@@ -332,7 +332,7 @@ void NewsPercentageMenu(myArray* trueN, myArray* fakeN, int trueRow, int fakeRow
 
 
 // most frequency
-void mostFrequentWord(myArray* file, int rowCount) {
+void mostFrequentWord(News* file, int rowCount) {
     const int size = 50000;
     WordFrequency* wordFreq = new WordFrequency[size];
     int uniqueCount = 0;
@@ -425,7 +425,7 @@ bool promoptPrint() {
     }
 }
 
-void sortArticle(myArray* file, int rowCount) {
+void sortArticle(News* file, int rowCount) {
     while(1) {
         int choice = 0;
         cout << "\nSort articles:" << endl;
@@ -442,7 +442,7 @@ void sortArticle(myArray* file, int rowCount) {
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
             continue;
         }
-        myArray* temp = new myArray[rowCount];
+        News* temp = new News[rowCount];
         for (int i = 0; i < rowCount; i++) temp[i] = file[i];
 
         auto start = high_resolution_clock::now();
@@ -490,7 +490,7 @@ string getInput() {
     }
 }
 
-void searchArticle(myArray* file, int rowCount, bool byYear) {
+void searchArticle(News* file, int rowCount, bool byYear) {
     int count = 0;
     int year = 2000;
     string subject = "";
@@ -519,7 +519,7 @@ void searchArticle(myArray* file, int rowCount, bool byYear) {
 }
 
 // 6.	Search the articles based on specific criteria, such as category, publication year
-void searchArticleMenu(myArray* file, int rowCount) {
+void searchArticleMenu(News* file, int rowCount) {
     while (1) {
         int choice = 0;
         cout << "\nPlease choose one option: " << endl;
@@ -545,7 +545,7 @@ void searchArticleMenu(myArray* file, int rowCount) {
     }
 }
 
-void menu(myArray* trueN, myArray* fakeN, int trueRow, int fakeRow) {
+void menu(News* trueN, News* fakeN, int trueRow, int fakeRow) {
     char fORt;
     while (1) {
         int choice = 0;
@@ -589,8 +589,8 @@ int main() {
     int trueNrowCount, fakeNrowCount;
     
     auto start = high_resolution_clock::now();
-    myArray* fakeN = readFile("fake.csv", fakeNrowCount);
-    myArray* trueN = readFile("true.csv", trueNrowCount);
+    News* fakeN = readFile("fake.csv", fakeNrowCount);
+    News* trueN = readFile("true.csv", trueNrowCount);
     auto stop = high_resolution_clock::now();
 
     menu(trueN, fakeN, trueNrowCount, fakeNrowCount);
