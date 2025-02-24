@@ -1,4 +1,6 @@
-// vincentlaucsb. (2018, July 2). GitHub - vincentlaucsb/csv-parser: A high-performance, fully-featured CSV parser and serializer for modern C++. GitHub. https://github.com/vincentlaucsb/csv-parser/tree/master
+// vincentlaucsb. (2018, July 2). GitHub - vincentlaucsb/csv-parser: A
+// high-performance, fully-featured CSV parser and serializer for modern C++.
+// GitHub. https://github.com/vincentlaucsb/csv-parser/tree/master
 
 #include "csv.hpp"
 #include "date.hpp"
@@ -220,7 +222,7 @@ struct News {
   }
 };
 
-void printNewsAfterSorting(News trueNews, News fakeNews) {
+void printNewsAfterSorting(News &trueNews, News &fakeNews) {
   while (true) {
     int choice = 0;
     cout << "\nChoose which to print: " << endl;
@@ -289,7 +291,7 @@ void printNewsPercentage(News *trueNews, News *fakeNews) {
     }
   }
 }
-void sortArticle(News trueNews, News fakeNews) {
+void sortArticle(News &trueNews, News &fakeNews) {
   while (true) {
     int choice = 0;
     cout
@@ -338,16 +340,14 @@ void sortArticle(News trueNews, News fakeNews) {
 
       auto durationSortingTrue = chrono::duration_cast<chrono::milliseconds>(
           endSortTrue - startSortTrue);
-      auto durationSortingFake =
-        chrono::duration_cast<chrono::milliseconds>(
-         endSortFake - startSortFake);
+      auto durationSortingFake = chrono::duration_cast<chrono::milliseconds>(
+          endSortFake - startSortFake);
 
       cout << "\nTrue news and fake news sorted." << endl;
       cout << "Time taken to sort true news: " << durationSortingTrue.count()
            << "ms" << endl;
-      cout << "Time taken to sort fake news: " <<
-        durationSortingFake.count()
-          << "ms" << endl;
+      cout << "Time taken to sort fake news: " << durationSortingFake.count()
+           << "ms" << endl;
 
       printNewsAfterSorting(trueNews, fakeNews);
     } else if (choice == 3) {
@@ -498,13 +498,14 @@ void mostFrequentWord(News *news) {
        << "ms" << endl;
 }
 
-void searchArticle(News *news, bool byYear) {
+void searchArticle(News news, bool byYear) {
   int count = 0;
   int year = 0;
   string subject = "";
 
   if (byYear) {
     cout << "\nEnter year to search: ";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cin >> year;
   } else {
     cout << "\nEnter subject (eg. politicsNews, worldnews) to search (or "
@@ -517,7 +518,7 @@ void searchArticle(News *news, bool byYear) {
   }
 
   auto start = chrono::high_resolution_clock::now();
-  Node *current = news->head;
+  Node *current = news.head;
   while (current != nullptr) {
     string temp = current->category;
     transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
@@ -539,7 +540,7 @@ void searchArticle(News *news, bool byYear) {
   cout << "Total Articles Found: " << count << endl;
 }
 
-void searchArticleMenu(News *trueNews, News *fakeNews) {
+void searchArticleMenu(News trueNews, News fakeNews) {
   int choice = 0;
   int filter = 0;
   while (true) {
@@ -650,7 +651,7 @@ int main() {
     } else if (choice == 3) {
       mostFrequentWord(&fakeNews);
     } else if (choice == 4) {
-      searchArticleMenu(&trueNews, &fakeNews);
+      searchArticleMenu(trueNews, fakeNews);
     } else if (choice == 5) {
       break;
     }
