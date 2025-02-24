@@ -91,103 +91,6 @@ struct News {
     return counter;
   }
 
-  Node *getTail(Node *start) {
-    Node *current = start;
-    while (current && current->next) {
-      current = current->next;
-    }
-    return current;
-  }
-
-  Node *hoarePartition(Node *start, Node *end) {
-    int pivotYear = start->date.year;
-    Node *left = start;
-    Node *right = end;
-
-    while (true) {
-      while (left && left->date.year < pivotYear) {
-        left = left->next;
-      }
-
-      while (right && right->date.year > pivotYear) {
-        right = right->prev;
-      }
-
-      if (left >= right || !left || !right || left == right->next) {
-        return right;
-      }
-
-      if (left != right) {
-        Node *leftPrev = left->prev;
-        Node *leftNext = left->next;
-        Node *rightPrev = right->prev;
-        Node *rightNext = right->next;
-
-        if (leftPrev)
-          leftPrev->next = right;
-        if (leftNext)
-          leftNext->prev = right;
-        left->prev = rightPrev;
-        left->next = rightNext;
-
-        if (rightPrev)
-          rightPrev->next = left;
-        if (rightNext)
-          rightNext->prev = left;
-        right->prev = leftPrev;
-        right->next = leftNext;
-
-        if (left == head)
-          head = right;
-        if (right == head)
-          head = left;
-        if (left == tail)
-          tail = right;
-        if (right == tail)
-          tail = left;
-
-        left = rightNext;
-        right = leftPrev;
-      }
-    }
-  }
-
-  void quickSortHelper(Node *start, Node *end) {
-    if (!start || start == end || !end || start == end->next) {
-      return;
-    }
-
-    Node *newHead = nullptr;
-    Node *newTail = nullptr;
-
-    Node *pivotPrev = hoarePartition(start, end);
-    Node *pivot = end;
-
-    if (!pivotPrev) {
-      quickSortHelper(pivot->next, newTail);
-    } else {
-      pivotPrev->next = nullptr;
-      if (pivot)
-        pivot->prev = nullptr;
-
-      quickSortHelper(newHead, pivotPrev);
-      quickSortHelper(pivot->next, newTail);
-    }
-
-    Node *temp = getTail(newHead);
-    if (temp && temp != pivot) {
-      temp->next = pivot;
-      pivot->prev = temp;
-    }
-  }
-
-  void quickSortByYear() {
-    if (!head || !head->next)
-      return;
-    quickSortHelper(head, getTail(head));
-    tail = getTail(head);
-  }
-
   Node *split(Node *head) {
     Node *slow = head;
     Node *fast = head;
@@ -394,8 +297,7 @@ void sortArticle(News trueNews, News fakeNews) {
     cout << "Sort articles:" << endl;
     cout << "1. Merge Sort" << endl;
     cout << "2. Bubble Sort" << endl;
-    cout << "3. Quick Sort" << endl;
-    cout << "4. Quit" << endl;
+    cout << "3. Quit" << endl;
 
     cin >> choice;
 
@@ -434,39 +336,19 @@ void sortArticle(News trueNews, News fakeNews) {
 
       auto durationSortingTrue = chrono::duration_cast<chrono::milliseconds>(
           endSortTrue - startSortTrue);
-      auto durationSortingFake = chrono::duration_cast<chrono::milliseconds>(
-          endSortFake - startSortFake);
+      auto durationSortingFake =
+        chrono::duration_cast<chrono::milliseconds>(
+         endSortFake - startSortFake);
 
       cout << "\nTrue news and fake news sorted." << endl;
       cout << "Time taken to sort true news: " << durationSortingTrue.count()
            << "ms" << endl;
-      cout << "Time taken to sort fake news: " << durationSortingFake.count()
-           << "ms" << endl;
+      cout << "Time taken to sort fake news: " <<
+        durationSortingFake.count()
+          << "ms" << endl;
 
       printNewsAfterSorting(trueNews, fakeNews);
     } else if (choice == 3) {
-      cout << "Sorting true news and fake news now..." << endl;
-      auto startSortTrue = chrono::high_resolution_clock::now();
-      trueNews.quickSortByYear();
-      auto endSortTrue = chrono::high_resolution_clock::now();
-
-      auto startSortFake = chrono::high_resolution_clock::now();
-      fakeNews.quickSortByYear();
-      auto endSortFake = chrono::high_resolution_clock::now();
-
-      auto durationSortingTrue = chrono::duration_cast<chrono::milliseconds>(
-          endSortTrue - startSortTrue);
-      auto durationSortingFake = chrono::duration_cast<chrono::milliseconds>(
-          endSortFake - startSortFake);
-
-      cout << "\nTrue news and fake news sorted." << endl;
-      cout << "Time taken to sort true news: " << durationSortingTrue.count()
-           << "ms" << endl;
-      cout << "Time taken to sort fake news: " << durationSortingFake.count()
-           << "ms" << endl;
-
-      printNewsAfterSorting(trueNews, fakeNews);
-    } else if (choice == 4) {
       break;
     } else {
       cout << "Invalid option, please choose again." << endl;
