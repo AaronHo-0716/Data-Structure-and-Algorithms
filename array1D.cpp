@@ -1,10 +1,5 @@
 // <GroupNo>_<TeamLeaderID>_<Member1ID>_<Member2ID>_<Member3ID>.zip
-// Use APA style citations within your code as comments and also mention them in your report.
-// cite the code from outside
-
-// C++ program to remove white spaces
-// from string using the function
-// boost::trim function
+// vincentlaucsb. (2018, July 2). GitHub - vincentlaucsb/csv-parser: A high-performance, fully-featured CSV parser and serializer for modern C++. GitHub. https://github.com/vincentlaucsb/csv-parser/tree/master
 
 #include "csv.hpp"
 #include "date.hpp"
@@ -483,15 +478,15 @@ string getInput() {
 
     while (true) {
         cout << "\nArticle Available: \n"
-            << "\tMiddle-east\n"
-            << "\tUS_News\n"
-            << "\tleft-news\n" 
-            << "\tGovernment News\n"
-            << "\tpolitics\n" 
-            << "\tNews\n" 
-            << "\tpoliticsNews\n"
-            << "\tworldnews\n"
-            << "\tExit\n"
+            << "Middle-east\n"
+            << "US_News\n"
+            << "left-news\n" 
+            << "Government News\n"
+            << "politics\n" 
+            << "News\n" 
+            << "politicsNews\n"
+            << "worldnews\n"
+            << "Exit\n"
             << "Enter article subject: ";
 
         cin.clear();
