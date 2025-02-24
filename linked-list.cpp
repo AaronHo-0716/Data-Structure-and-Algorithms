@@ -1,3 +1,5 @@
+// vincentlaucsb. (2018, July 2). GitHub - vincentlaucsb/csv-parser: A high-performance, fully-featured CSV parser and serializer for modern C++. GitHub. https://github.com/vincentlaucsb/csv-parser/tree/master
+
 #include "csv.hpp"
 #include "date.hpp"
 #include <chrono>
