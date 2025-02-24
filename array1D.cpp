@@ -483,15 +483,15 @@ string getInput() {
 
     while (true) {
         cout << "\nArticle Available: \n"
-            << "Middle-east\n"
-            << "US_News\n"
-            << "left-news\n" 
-            << "Government News\n"
-            << "politics\n" 
-            << "News\n" 
-            << "politicsNews\n"
-            << "worldnews\n"
-            << "Exit\n"
+            << "\tMiddle-east\n"
+            << "\tUS_News\n"
+            << "\tleft-news\n" 
+            << "\tGovernment News\n"
+            << "\tpolitics\n" 
+            << "\tNews\n" 
+            << "\tpoliticsNews\n"
+            << "\tworldnews\n"
+            << "\tExit\n"
             << "Enter article subject: ";
 
         cin.clear();
