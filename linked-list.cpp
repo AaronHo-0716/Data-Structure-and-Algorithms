@@ -318,7 +318,7 @@ struct News {
 void printNewsAfterSorting(News trueNews, News fakeNews) {
   while (true) {
     int choice = 0;
-    cout << "Choose which to print: " << endl;
+    cout << "\nChoose which to print: " << endl;
     cout << "1. True News" << endl;
     cout << "2. Fake News" << endl;
     cout << "3. Quit" << endl;
@@ -387,9 +387,10 @@ void printNewsPercentage(News *trueNews, News *fakeNews) {
 void sortArticle(News trueNews, News fakeNews) {
   while (true) {
     int choice = 0;
-    cout << "Remember to close the program and open again if you have already "
-            "sorted the articles."
-         << endl;
+    cout
+        << "\nRemember to close the program and open again if you have already "
+           "sorted the articles."
+        << endl;
     cout << "Sort articles:" << endl;
     cout << "1. Merge Sort" << endl;
     cout << "2. Bubble Sort" << endl;
@@ -399,7 +400,7 @@ void sortArticle(News trueNews, News fakeNews) {
     cin >> choice;
 
     if (choice == 1) {
-      cout << "Sorting true news and fake news now..." << endl;
+      cout << "\nSorting true news and fake news now..." << endl;
       auto startSortTrue = chrono::high_resolution_clock::now();
       trueNews.mergeSortByYear();
       auto endSortTrue = chrono::high_resolution_clock::now();
@@ -413,7 +414,7 @@ void sortArticle(News trueNews, News fakeNews) {
       auto durationSortingFake = chrono::duration_cast<chrono::milliseconds>(
           endSortFake - startSortFake);
 
-      cout << "True news and fake news sorted." << endl;
+      cout << "\nTrue news and fake news sorted." << endl;
       cout << "Time taken to sort true news: " << durationSortingTrue.count()
            << "ms" << endl;
       cout << "Time taken to sort fake news: " << durationSortingFake.count()
@@ -436,7 +437,7 @@ void sortArticle(News trueNews, News fakeNews) {
       auto durationSortingFake = chrono::duration_cast<chrono::milliseconds>(
           endSortFake - startSortFake);
 
-      cout << "True news and fake news sorted." << endl;
+      cout << "\nTrue news and fake news sorted." << endl;
       cout << "Time taken to sort true news: " << durationSortingTrue.count()
            << "ms" << endl;
       cout << "Time taken to sort fake news: " << durationSortingFake.count()
@@ -458,7 +459,7 @@ void sortArticle(News trueNews, News fakeNews) {
       auto durationSortingFake = chrono::duration_cast<chrono::milliseconds>(
           endSortFake - startSortFake);
 
-      cout << "True news and fake news sorted." << endl;
+      cout << "\nTrue news and fake news sorted." << endl;
       cout << "Time taken to sort true news: " << durationSortingTrue.count()
            << "ms" << endl;
       cout << "Time taken to sort fake news: " << durationSortingFake.count()
@@ -619,10 +620,11 @@ void searchArticle(News *news, bool byYear) {
   string subject = "";
 
   if (byYear) {
-    cout << "Enter year to search: ";
+    cout << "\nEnter year to search: ";
     cin >> year;
   } else {
-    cout << "Enter subject to search (or 'exit' to quit): ";
+    cout << "\nEnter subject to search (or 'exit' to quit): ";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     getline(cin, subject);
     if (subject == "exit")
       return;
@@ -656,14 +658,14 @@ void searchArticleMenu(News *trueNews, News *fakeNews) {
   int choice = 0;
   int filter = 0;
   while (true) {
-    cout << "Search which dataset: " << endl;
+    cout << "\nSearch which dataset: " << endl;
     cout << "1. True News" << endl;
     cout << "2. Fake News" << endl;
     cout << "3. Quit" << endl;
 
     cin >> choice;
 
-    if(choice == 3) {
+    if (choice == 3) {
       break;
     }
 
@@ -748,7 +750,7 @@ int main() {
 
   while (true) {
     int choice = 0;
-    cout << "Please choose one option: " << endl;
+    cout << "\nPlease choose one option: " << endl;
     cout << "1. Percentage of fake news pew year." << endl;
     cout << "2. Sort the news article by year." << endl;
     cout << "3. Most frequent words in goverment fake news." << endl;
