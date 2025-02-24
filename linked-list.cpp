@@ -623,7 +623,8 @@ void searchArticle(News *news, bool byYear) {
     cout << "\nEnter year to search: ";
     cin >> year;
   } else {
-    cout << "\nEnter subject to search (or 'exit' to quit): ";
+    cout << "\nEnter subject (eg. politicsNews, worldnews) to search (or "
+            "'exit' to quit): ";
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     getline(cin, subject);
     if (subject == "exit")
