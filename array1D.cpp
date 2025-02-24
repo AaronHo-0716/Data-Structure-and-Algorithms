@@ -124,7 +124,7 @@ bool compareWordFrequency(const WordFrequency& a, const WordFrequency& b) {
     return a.frequency > b.frequency; // Descending order
 }
 
-bool compareMyArray(const News& a, const News& b) {
+bool compareNews(const News& a, const News& b) {
     return tie(a.publicationDate.year, a.publicationDate.month, a.publicationDate.day) < tie(b.publicationDate.year, b.publicationDate.month, b.publicationDate.day);
 }
 
@@ -252,7 +252,7 @@ int counter(News* file, int rowCount, int year, int month) {
     return count;
 }
 
-// int counter(myArray* file, int rowCount, int year) {
+// int counter(News* file, int rowCount, int year) {
 //     int count = 0;
 //     for (int i = 0; i < rowCount; i++) {
 //         if (file[i].publicationDate.year == year && 
@@ -463,9 +463,9 @@ void sortArticle(News* file, int rowCount) {
 
         auto start = high_resolution_clock::now();
         switch (choice) {
-            case 1: mergeSort(temp, 0, rowCount - 1, compareMyArray); break;
-            case 2: bubbleSort(temp, rowCount, compareMyArray); break; 
-            case 3: quickSort(temp, 0, rowCount - 1, compareMyArray); break; 
+            case 1: mergeSort(temp, 0, rowCount - 1, compareNews); break;
+            case 2: bubbleSort(temp, rowCount, compareNews); break; 
+            case 3: quickSort(temp, 0, rowCount - 1, compareNews); break; 
             default: break;
         }
         if (choice != 5) {
