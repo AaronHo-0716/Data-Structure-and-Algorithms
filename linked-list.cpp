@@ -99,50 +99,58 @@ struct News {
     return current;
   }
 
-  Node* hoarePartition(Node* start, Node* end) {
-        int pivotYear = start->date.year;
-        Node* left = start;
-        Node* right = end;
+  Node *hoarePartition(Node *start, Node *end) {
+    int pivotYear = start->date.year;
+    Node *left = start;
+    Node *right = end;
 
-        while (true) {
-            while (left && left->date.year < pivotYear) {
-                left = left->next;
-            }
+    while (true) {
+      while (left && left->date.year < pivotYear) {
+        left = left->next;
+      }
 
-            while (right && right->date.year > pivotYear) {
-                right = right->prev;
-            }
+      while (right && right->date.year > pivotYear) {
+        right = right->prev;
+      }
 
-            if (left >= right || !left || !right || left == right->next) {
-                return right;
-            }
+      if (left >= right || !left || !right || left == right->next) {
+        return right;
+      }
 
-            if (left != right) {
-                Node* leftPrev = left->prev;
-                Node* leftNext = left->next;
-                Node* rightPrev = right->prev;
-                Node* rightNext = right->next;
+      if (left != right) {
+        Node *leftPrev = left->prev;
+        Node *leftNext = left->next;
+        Node *rightPrev = right->prev;
+        Node *rightNext = right->next;
 
-                if (leftPrev) leftPrev->next = right;
-                if (leftNext) leftNext->prev = right;
-                left->prev = rightPrev;
-                left->next = rightNext;
+        if (leftPrev)
+          leftPrev->next = right;
+        if (leftNext)
+          leftNext->prev = right;
+        left->prev = rightPrev;
+        left->next = rightNext;
 
-                if (rightPrev) rightPrev->next = left;
-                if (rightNext) rightNext->prev = left;
-                right->prev = leftPrev;
-                right->next = leftNext;
+        if (rightPrev)
+          rightPrev->next = left;
+        if (rightNext)
+          rightNext->prev = left;
+        right->prev = leftPrev;
+        right->next = leftNext;
 
-                if (left == head) head = right;
-                if (right == head) head = left;
-                if (left == tail) tail = right;
-                if (right == tail) tail = left;
+        if (left == head)
+          head = right;
+        if (right == head)
+          head = left;
+        if (left == tail)
+          tail = right;
+        if (right == tail)
+          tail = left;
 
-                left = rightNext;
-                right = leftPrev;
-            }
-        }
+        left = rightNext;
+        right = leftPrev;
+      }
     }
+  }
 
   void quickSortHelper(Node *start, Node *end) {
     if (!start || start == end || !end || start == end->next) {
@@ -464,7 +472,144 @@ void sortArticle(News trueNews, News fakeNews) {
     }
   }
 }
-void mostFrequentWord() {}
+
+struct WordFrequency {
+  string word;
+  int frequency;
+  WordFrequency *next;
+  WordFrequency *prev;
+
+  WordFrequency(string w)
+      : word(w), frequency(1), next(nullptr), prev(nullptr) {}
+};
+
+struct WordFrequencyList {
+  WordFrequency *head;
+  WordFrequency *tail;
+  int count;
+
+  WordFrequencyList() : head(nullptr), tail(nullptr), count(0) {}
+
+  void addOrUpdate(string w) {
+    WordFrequency *current = head;
+    while (current) {
+      if (current->word == w) {
+        current->frequency++;
+        return;
+      }
+      current = current->next;
+    }
+    // Not found, add new node
+    WordFrequency *newNode = new WordFrequency(w);
+    if (!head) {
+      head = tail = newNode;
+    } else {
+      tail->next = newNode;
+      newNode->prev = tail;
+      tail = newNode;
+    }
+    count++;
+  }
+
+  // Bubble sort by frequency (descending)
+  void bubbleSortByFrequency() {
+    if (!head || !head->next)
+      return;
+
+    bool swapped;
+    WordFrequency *current;
+    WordFrequency *lastSorted = nullptr;
+
+    do {
+      swapped = false;
+      current = head;
+
+      while (current->next != lastSorted) {
+        if (current->frequency < current->next->frequency) {
+          // Swap nodes
+          WordFrequency *tempNext = current->next;
+
+          current->next = tempNext->next;
+          tempNext->next = current;
+
+          tempNext->prev = current->prev;
+          current->prev = tempNext;
+
+          if (tempNext->prev == nullptr) {
+            head = tempNext;
+          } else {
+            tempNext->prev->next = tempNext;
+          }
+
+          if (current->next) {
+            current->next->prev = current;
+          }
+
+          if (current == tail) {
+            tail = tempNext;
+          }
+
+          swapped = true;
+          current = tempNext;
+        }
+        current = current->next;
+        if (!current)
+          break;
+      }
+      lastSorted = current;
+    } while (swapped);
+  }
+
+  // Clean up memory
+  ~WordFrequencyList() {
+    WordFrequency *current = head;
+    while (current) {
+      WordFrequency *next = current->next;
+      delete current;
+      current = next;
+    }
+  }
+};
+
+void mostFrequentWord(News* news) {
+    WordFrequencyList wordFreqList;
+    string w;
+
+    auto start = chrono::high_resolution_clock::now();
+
+    Node* currentNews = news->head;
+    while (currentNews != nullptr) {
+        if (currentNews->category == "Government News") {
+            string text = currentNews->title;
+            transform(text.begin(), text.end(), text.begin(), ::tolower);
+
+            // Remove punctuation
+            text.erase(remove_if(text.begin(), text.end(), [](char c) {
+                return ispunct(c);
+            }), text.end());
+
+            istringstream ss(text);
+            while (ss >> w) {
+                wordFreqList.addOrUpdate(w);
+            }
+        }
+        currentNews = currentNews->next;
+    }
+
+    wordFreqList.bubbleSortByFrequency();
+
+    // Output top 20
+    cout << "\nTop 20 Most Frequent Words in Government topics:\n";
+    WordFrequency* current = wordFreqList.head;
+    for (int i = 0; i < min(20, wordFreqList.count) && current; i++) {
+        cout << i + 1 << ". " << current->word << " (Count: " << current->frequency << ")\n";
+        current = current->next;
+    }
+
+    auto stop = chrono::high_resolution_clock::now();
+    cout << "Time Duration: " << (chrono::duration_cast<chrono::milliseconds>(stop - start)).count() << "ms" << endl;
+}
+
 void searchArticle() {}
 
 int main() {
@@ -529,6 +674,7 @@ int main() {
     } else if (choice == 2) {
       sortArticle(trueNews, fakeNews);
     } else if (choice == 3) {
+      mostFrequentWord(&fakeNews);
     } else if (choice == 4) {
     } else if (choice == 5) {
       break;
