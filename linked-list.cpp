@@ -280,9 +280,9 @@ void printNewsPercentage(News *trueNews, News *fakeNews) {
     cout << "---------------------------------------------------------\n";
 
     for (int i = 0; i < 12; i++) {
-      cout << left << setw(12) << months[i] << " | "; // Align month names
+      cout << left << setw(12) << months[i] << " | ";
       int stars = static_cast<int>(
-          percentageOfFakeNews[i]); // Convert percentage to integer for stars
+          percentageOfFakeNews[i]);
       for (int j = 0; j < stars; j++) {
         cout << "*";
       }
@@ -384,7 +384,6 @@ struct WordFrequencyList {
       }
       current = current->next;
     }
-    // Not found, add new node
     WordFrequency *newNode = new WordFrequency(w);
     if (!head) {
       head = tail = newNode;
@@ -445,7 +444,6 @@ struct WordFrequencyList {
     } while (swapped);
   }
 
-  // Clean up memory
   ~WordFrequencyList() {
     WordFrequency *current = head;
     while (current) {
@@ -468,7 +466,6 @@ void mostFrequentWord(News *news) {
       string text = currentNews->title;
       transform(text.begin(), text.end(), text.begin(), ::tolower);
 
-      // Remove punctuation
       text.erase(remove_if(text.begin(), text.end(),
                            [](char c) { return ispunct(c); }),
                  text.end());
