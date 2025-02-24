@@ -337,16 +337,16 @@ void printNewsAfterSorting(News trueNews, News fakeNews) {
   }
 }
 
-void printNewsPercentage(News trueNews, News fakeNews) {
+void printNewsPercentage(News *trueNews, News *fakeNews) {
   int filterYear;
   string months[12] = {"January",   "February", "March",    "April",
                        "May",       "June",     "July",     "August",
                        "September", "October",  "November", "December"};
   float percentageOfFakeNews[12] = {};
 
-  cout << "Welcome to Percentage of Fake Political News Articles" << endl;
+  cout << "\nWelcome to Percentage of Fake Political News Articles" << endl;
   while (true) {
-    cout << "Please enter the year you want to search (Type 0 ti quit): ";
+    cout << "Please enter the year you want to search (Type 0 to quit): ";
     cin >> filterYear;
 
     if (filterYear == 0) {
@@ -354,8 +354,8 @@ void printNewsPercentage(News trueNews, News fakeNews) {
     }
 
     for (int i = 0; i < 12; i++) {
-      int trueCount = trueNews.newsPerMonthByYear(i + 1, filterYear);
-      int fakeCount = fakeNews.newsPerMonthByYear(i + 1, filterYear);
+      int trueCount = trueNews->newsPerMonthByYear(i + 1, filterYear);
+      int fakeCount = fakeNews->newsPerMonthByYear(i + 1, filterYear);
 
       if (trueCount + fakeCount == 0) {
         percentageOfFakeNews[i] = 0; // Avoid division by zero
@@ -571,46 +571,133 @@ struct WordFrequencyList {
   }
 };
 
-void mostFrequentWord(News* news) {
-    WordFrequencyList wordFreqList;
-    string w;
+void mostFrequentWord(News *news) {
+  WordFrequencyList wordFreqList;
+  string w;
 
-    auto start = chrono::high_resolution_clock::now();
+  auto start = chrono::high_resolution_clock::now();
 
-    Node* currentNews = news->head;
-    while (currentNews != nullptr) {
-        if (currentNews->category == "Government News") {
-            string text = currentNews->title;
-            transform(text.begin(), text.end(), text.begin(), ::tolower);
+  Node *currentNews = news->head;
+  while (currentNews != nullptr) {
+    if (currentNews->category == "Government News") {
+      string text = currentNews->title;
+      transform(text.begin(), text.end(), text.begin(), ::tolower);
 
-            // Remove punctuation
-            text.erase(remove_if(text.begin(), text.end(), [](char c) {
-                return ispunct(c);
-            }), text.end());
+      // Remove punctuation
+      text.erase(remove_if(text.begin(), text.end(),
+                           [](char c) { return ispunct(c); }),
+                 text.end());
 
-            istringstream ss(text);
-            while (ss >> w) {
-                wordFreqList.addOrUpdate(w);
-            }
-        }
-        currentNews = currentNews->next;
+      istringstream ss(text);
+      while (ss >> w) {
+        wordFreqList.addOrUpdate(w);
+      }
     }
+    currentNews = currentNews->next;
+  }
 
-    wordFreqList.bubbleSortByFrequency();
+  wordFreqList.bubbleSortByFrequency();
 
-    // Output top 20
-    cout << "\nTop 20 Most Frequent Words in Government topics:\n";
-    WordFrequency* current = wordFreqList.head;
-    for (int i = 0; i < min(20, wordFreqList.count) && current; i++) {
-        cout << i + 1 << ". " << current->word << " (Count: " << current->frequency << ")\n";
-        current = current->next;
-    }
+  // Output top 20
+  cout << "\nTop 20 Most Frequent Words in Government topics:\n";
+  WordFrequency *current = wordFreqList.head;
+  for (int i = 0; i < min(20, wordFreqList.count) && current; i++) {
+    cout << i + 1 << ". " << current->word << " (Count: " << current->frequency
+         << ")\n";
+    current = current->next;
+  }
 
-    auto stop = chrono::high_resolution_clock::now();
-    cout << "Time Duration: " << (chrono::duration_cast<chrono::milliseconds>(stop - start)).count() << "ms" << endl;
+  auto stop = chrono::high_resolution_clock::now();
+  cout << "Time Duration: "
+       << (chrono::duration_cast<chrono::milliseconds>(stop - start)).count()
+       << "ms" << endl;
 }
 
-void searchArticle() {}
+void searchArticle(News *news, bool byYear) {
+  int count = 0;
+  int year = 0;
+  string subject = "";
+
+  if (byYear) {
+    cout << "Enter year to search: ";
+    cin >> year;
+  } else {
+    cout << "Enter subject to search (or 'exit' to quit): ";
+    getline(cin, subject);
+    if (subject == "exit")
+      return;
+    transform(subject.begin(), subject.end(), subject.begin(), ::tolower);
+  }
+
+  auto start = chrono::high_resolution_clock::now();
+  Node *current = news->head;
+  while (current != nullptr) {
+    string temp = current->category;
+    transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+
+    if ((byYear && current->date.year == year) ||
+        (!byYear && temp == subject)) {
+      count++;
+      cout << "[line " << count << "] title: " << current->title
+           << " | category: " << current->category
+           << " | Date: " << current->date.getDate() << endl;
+    }
+    current = current->next;
+  }
+
+  auto stop = chrono::high_resolution_clock::now();
+  cout << "Time Duration: "
+       << (chrono::duration_cast<chrono::milliseconds>(stop - start)).count()
+       << "ms" << endl;
+  cout << "Total Articles Found: " << count << endl;
+}
+
+void searchArticleMenu(News *trueNews, News *fakeNews) {
+  int choice = 0;
+  int filter = 0;
+  while (true) {
+    cout << "Search which dataset: " << endl;
+    cout << "1. True News" << endl;
+    cout << "2. Fake News" << endl;
+    cout << "3. Quit" << endl;
+
+    cin >> choice;
+
+    if(choice == 3) {
+      break;
+    }
+
+    if (choice != 1 && choice != 2) {
+      cout << "Invalid option, please choose again." << endl;
+      continue;
+    }
+
+    cout << "Please choose one option: " << endl;
+    cout << "1. Search Article by Year." << endl;
+    cout << "2. Search Article by Subject." << endl;
+
+    cin >> filter;
+    if (filter != 1 && filter != 2) {
+      cout << "Invalid option, please choose again." << endl;
+      continue;
+    }
+
+    if (choice == 1) {
+      if (filter == 1) {
+        searchArticle(trueNews, true);
+      } else {
+        searchArticle(trueNews, false);
+      }
+
+    } else if (choice == 2) {
+      if (filter == 1) {
+        searchArticle(fakeNews, true);
+      } else {
+        searchArticle(fakeNews, false);
+      }
+    }
+  }
+}
 
 int main() {
   News trueNews = News();
@@ -670,12 +757,13 @@ int main() {
     cin >> choice;
 
     if (choice == 1) {
-      printNewsPercentage(trueNews, fakeNews);
+      printNewsPercentage(&trueNews, &fakeNews);
     } else if (choice == 2) {
       sortArticle(trueNews, fakeNews);
     } else if (choice == 3) {
       mostFrequentWord(&fakeNews);
     } else if (choice == 4) {
+      searchArticleMenu(&trueNews, &fakeNews);
     } else if (choice == 5) {
       break;
     }
