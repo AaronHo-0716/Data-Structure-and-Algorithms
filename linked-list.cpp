@@ -4,10 +4,12 @@
 
 #include "csv.hpp"
 #include "date.hpp"
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 using namespace csv;
@@ -47,12 +49,58 @@ struct News {
 
   News() : counter(0), head(nullptr), tail(nullptr) {}
 
+  // Destructor to free all nodes
+  ~News() {
+    Node *current = head;
+    while (current != nullptr) {
+      Node *next = current->next;
+      delete current;
+      current = next;
+    }
+    head = nullptr;
+    tail = nullptr;
+  }
+
+  // Disable copy constructor to prevent double-free
+  News(const News &) = delete;
+  News &operator=(const News &) = delete;
+
+  // Add move constructor and move assignment if needed
+  News(News &&other) noexcept
+      : counter(other.counter), head(other.head), tail(other.tail) {
+    other.counter = 0;
+    other.head = nullptr;
+    other.tail = nullptr;
+  }
+
+  News &operator=(News &&other) noexcept {
+    if (this != &other) {
+      // Clean up existing data
+      Node *current = head;
+      while (current != nullptr) {
+        Node *next = current->next;
+        delete current;
+        current = next;
+      }
+
+      // Move data from other
+      counter = other.counter;
+      head = other.head;
+      tail = other.tail;
+
+      // Clear other
+      other.counter = 0;
+      other.head = nullptr;
+      other.tail = nullptr;
+    }
+    return *this;
+  }
+
   void printNewsCount() { cout << counter << endl; }
 
   void insertAtBack(string title, string content, string category,
                     string date) {
     Node *node = new Node(title, content, category, date);
-
     if (head == nullptr) {
       head = node;
       tail = node;
@@ -91,19 +139,16 @@ struct News {
         current = current->next;
       }
     }
-
     return counter;
   }
 
   Node *split(Node *head) {
     Node *slow = head;
     Node *fast = head;
-
     while (fast->next && fast->next->next) {
       slow = slow->next;
       fast = fast->next->next;
     }
-
     Node *secondHalf = slow->next;
     slow->next = nullptr;
     if (secondHalf) {
@@ -146,13 +191,21 @@ struct News {
 
     News left;
     News right;
+
     left.head = head;
     right.head = second;
 
+    // Find tails
+    left.tail = head;
+    while (left.tail && left.tail->next) {
+      left.tail = left.tail->next;
+    }
+
     if (second) {
-      right.tail = tail;
-    } else {
-      left.tail = tail;
+      right.tail = second;
+      while (right.tail && right.tail->next) {
+        right.tail = right.tail->next;
+      }
     }
 
     left.mergeSortByYear();
@@ -160,10 +213,17 @@ struct News {
 
     head = merge(left.head, right.head);
 
+    // Update tail
     tail = head;
     while (tail && tail->next) {
       tail = tail->next;
     }
+
+    // CRITICAL: Prevent destructors from freeing the nodes
+    left.head = nullptr;
+    left.tail = nullptr;
+    right.head = nullptr;
+    right.tail = nullptr;
   }
 
   void bubbleSortByYear() {
@@ -184,10 +244,8 @@ struct News {
         if (current->date.year > current->next->date.year) {
           // Swap nodes
           Node *tempNext = current->next;
-
           current->next = tempNext->next;
           tempNext->next = current;
-
           tempNext->prev = current->prev;
           current->prev = tempNext;
 
@@ -207,16 +265,13 @@ struct News {
           }
 
           swapped = true;
-
           current = tempNext;
         }
-
         current = current->next;
         if (!current) {
           break;
         }
       }
-
       lastSorted = current;
     } while (swapped);
   }
@@ -229,7 +284,6 @@ void printNewsAfterSorting(News &trueNews, News &fakeNews) {
     cout << "1. True News" << endl;
     cout << "2. Fake News" << endl;
     cout << "3. Quit" << endl;
-
     cin >> choice;
 
     if (choice == 1) {
@@ -252,6 +306,7 @@ void printNewsPercentage(News *trueNews, News *fakeNews) {
   float percentageOfFakeNews[12] = {};
 
   cout << "\nWelcome to Percentage of Fake Political News Articles" << endl;
+
   while (true) {
     cout << "Please enter the year you want to search (Type 0 to quit): ";
     cin >> filterYear;
@@ -281,8 +336,7 @@ void printNewsPercentage(News *trueNews, News *fakeNews) {
 
     for (int i = 0; i < 12; i++) {
       cout << left << setw(12) << months[i] << " | ";
-      int stars = static_cast<int>(
-          percentageOfFakeNews[i]);
+      int stars = static_cast<int>(percentageOfFakeNews[i]);
       for (int j = 0; j < stars; j++) {
         cout << "*";
       }
@@ -291,22 +345,22 @@ void printNewsPercentage(News *trueNews, News *fakeNews) {
     }
   }
 }
+
 void sortArticle(News &trueNews, News &fakeNews) {
   while (true) {
     int choice = 0;
-    cout
-        << "\nRemember to close the program and open again if you have already "
-           "sorted the articles."
-        << endl;
+    cout << "\nRemember to close the program and open again if you have "
+            "already sorted the articles."
+         << endl;
     cout << "Sort articles:" << endl;
     cout << "1. Merge Sort" << endl;
     cout << "2. Bubble Sort" << endl;
     cout << "3. Quit" << endl;
-
     cin >> choice;
 
     if (choice == 1) {
       cout << "\nSorting true news and fake news now..." << endl;
+
       auto startSortTrue = chrono::high_resolution_clock::now();
       trueNews.mergeSortByYear();
       auto endSortTrue = chrono::high_resolution_clock::now();
@@ -327,9 +381,9 @@ void sortArticle(News &trueNews, News &fakeNews) {
            << "ms" << endl;
 
       printNewsAfterSorting(trueNews, fakeNews);
-
     } else if (choice == 2) {
       cout << "Sorting true news and fake news now..." << endl;
+
       auto startSortTrue = chrono::high_resolution_clock::now();
       trueNews.bubbleSortByYear();
       auto endSortTrue = chrono::high_resolution_clock::now();
@@ -384,6 +438,7 @@ struct WordFrequencyList {
       }
       current = current->next;
     }
+
     WordFrequency *newNode = new WordFrequency(w);
     if (!head) {
       head = tail = newNode;
@@ -412,10 +467,8 @@ struct WordFrequencyList {
         if (current->frequency < current->next->frequency) {
           // Swap nodes
           WordFrequency *tempNext = current->next;
-
           current->next = tempNext->next;
           tempNext->next = current;
-
           tempNext->prev = current->prev;
           current->prev = tempNext;
 
@@ -465,7 +518,6 @@ void mostFrequentWord(News *news) {
     if (currentNews->category == "Government News") {
       string text = currentNews->title;
       transform(text.begin(), text.end(), text.begin(), ::tolower);
-
       text.erase(remove_if(text.begin(), text.end(),
                            [](char c) { return ispunct(c); }),
                  text.end());
@@ -495,7 +547,7 @@ void mostFrequentWord(News *news) {
        << "ms" << endl;
 }
 
-void searchArticle(News news, bool byYear) {
+void searchArticle(const News &news, bool byYear) {
   int count = 0;
   int year = 0;
   string subject = "";
@@ -509,12 +561,15 @@ void searchArticle(News news, bool byYear) {
             "'exit' to quit): ";
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     getline(cin, subject);
+
     if (subject == "exit")
       return;
+
     transform(subject.begin(), subject.end(), subject.begin(), ::tolower);
   }
 
   auto start = chrono::high_resolution_clock::now();
+
   Node *current = news.head;
   while (current != nullptr) {
     string temp = current->category;
@@ -537,15 +592,15 @@ void searchArticle(News news, bool byYear) {
   cout << "Total Articles Found: " << count << endl;
 }
 
-void searchArticleMenu(News trueNews, News fakeNews) {
+void searchArticleMenu(const News &trueNews, const News &fakeNews) {
   int choice = 0;
   int filter = 0;
+
   while (true) {
     cout << "\nSearch which dataset: " << endl;
     cout << "1. True News" << endl;
     cout << "2. Fake News" << endl;
     cout << "3. Quit" << endl;
-
     cin >> choice;
 
     if (choice == 3) {
@@ -560,8 +615,8 @@ void searchArticleMenu(News trueNews, News fakeNews) {
     cout << "Please choose one option: " << endl;
     cout << "1. Search Article by Year." << endl;
     cout << "2. Search Article by Subject." << endl;
-
     cin >> filter;
+
     if (filter != 1 && filter != 2) {
       cout << "Invalid option, please choose again." << endl;
       continue;
@@ -573,7 +628,6 @@ void searchArticleMenu(News trueNews, News fakeNews) {
       } else {
         searchArticle(trueNews, false);
       }
-
     } else if (choice == 2) {
       if (filter == 1) {
         searchArticle(fakeNews, true);
@@ -589,7 +643,6 @@ int main() {
   News fakeNews = News();
 
   auto startOfReadingTrue = chrono::high_resolution_clock::now();
-
   for (CSVRow &row : reader) {
     string entries[4];
     int counter = 0;
@@ -600,9 +653,9 @@ int main() {
     trueNews.insertAtBack(entries[0], entries[1], entries[2], entries[3]);
   }
   auto stopOfReadingTrue = chrono::high_resolution_clock::now();
+
   cout << "Numbers of true news loaded: " << endl;
   trueNews.printNewsCount();
-
   auto durationReadingTrue = chrono::duration_cast<chrono::milliseconds>(
       stopOfReadingTrue - startOfReadingTrue);
   cout << "Time spent loading true news: " << durationReadingTrue.count()
@@ -611,7 +664,6 @@ int main() {
 
   CSVReader reader("fake.csv");
   auto startOfReadingFake = chrono::high_resolution_clock::now();
-
   for (CSVRow &row : reader) {
     string entries[4];
     int counter = 0;
@@ -622,9 +674,9 @@ int main() {
     fakeNews.insertAtBack(entries[0], entries[1], entries[2], entries[3]);
   }
   auto stopOfReadingFake = chrono::high_resolution_clock::now();
+
   cout << "Numbers of fake news loaded: " << endl;
   fakeNews.printNewsCount();
-
   auto durationReadingFake = chrono::duration_cast<chrono::milliseconds>(
       stopOfReadingFake - startOfReadingFake);
   cout << "Time spent loading fake news: " << durationReadingFake.count()
@@ -634,9 +686,9 @@ int main() {
   while (true) {
     int choice = 0;
     cout << "\nPlease choose one option: " << endl;
-    cout << "1. Percentage of fake news pew year." << endl;
+    cout << "1. Percentage of fake news per year." << endl;
     cout << "2. Sort the news article by year." << endl;
-    cout << "3. Most frequent words in goverment fake news." << endl;
+    cout << "3. Most frequent words in government fake news." << endl;
     cout << "4. Search article." << endl;
     cout << "5. Exit " << endl;
     cin >> choice;
@@ -653,4 +705,6 @@ int main() {
       break;
     }
   }
+
+  return 0;
 }
