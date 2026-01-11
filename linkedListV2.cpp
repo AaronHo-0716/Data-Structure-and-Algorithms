@@ -31,11 +31,6 @@ struct NewsArticle {
     this->day = date.day;
   }
 
-  /**
-   * FP Concept: Pure Function / Const Correctness
-   * This method is marked 'const' to ensure it does not mutate the NewsArticle
-   * instance, maintaining the integrity of the data.
-   */
   string printNews() const {
     return title + "," + content + "," + category + ", " +
            const_cast<Date &>(date).getDate();
@@ -72,12 +67,6 @@ public:
   NewsList(const NewsList &) = delete;
   NewsList &operator=(const NewsList &) = delete;
 
-  /**
-   * FP Concept: Move Semantics
-   * Necessary to support a functional style where NewsList objects are
-   * returned by value from functions without the performance overhead of deep
-   * copying.
-   */
   NewsList(NewsList &&other) noexcept
       : head(other.head), tail(other.tail), size(other.size) {
     other.head = nullptr;
@@ -106,7 +95,7 @@ public:
     return *this;
   }
 
-  void append(NewsArticle data) {
+  void insertAtBack(NewsArticle data) {
     Node *newNode = new Node(move(data));
     if (!head) {
       head = tail = newNode;
@@ -118,28 +107,17 @@ public:
     size++;
   }
 
-  /**
-   * FP Concept: Higher-Order Function (Filter)
-   * This function takes a 'Predicate' (a lambda or function pointer) as an
-   * argument. It demonstrates Immutability by returning a brand new NewsList
-   * containing only the elements that satisfy the predicate, leaving the
-   * original list untouched.
-   */
   template <typename Predicate> NewsList filter(Predicate predicate) const {
     NewsList result;
     Node *curr = head;
     while (curr) {
       if (predicate(curr->data))
-        result.append(curr->data);
+        result.insertAtBack(curr->data);
       curr = curr->next;
     }
     return result;
   }
 
-  /**
-   * FP Concept: Higher-Order Function
-   * Aggregates data based on a provided functional logic (predicate).
-   */
   template <typename Predicate> int countIf(Predicate predicate) const {
     int count = 0;
     Node *curr = head;
@@ -152,10 +130,6 @@ public:
   }
 };
 
-/**
- * FP Concept: Pure Function
- * A deterministic function that compares two articles based on year.
- */
 bool isEarlier(const NewsArticle &a, const NewsArticle &b) {
   return tie(a.year) < tie(b.year);
 }
@@ -202,17 +176,11 @@ Node *mergeSortRecursive(Node *head) {
   return mergeNodes(mergeSortRecursive(head), mergeSortRecursive(second));
 }
 
-/**
- * FP Concept: Immutability
- * This function treats the input NewsList as immutable. It creates a deep copy
- * of the original data into a new NewsList, sorts the new instance, and returns
- * it.
- */
 NewsList functionalMergeSort(const NewsList &original) {
   NewsList sorted;
   Node *curr = original.head;
   while (curr) {
-    sorted.append(curr->data);
+    sorted.insertAtBack(curr->data);
     curr = curr->next;
   }
   if (sorted.head) {
@@ -225,18 +193,12 @@ NewsList functionalMergeSort(const NewsList &original) {
   return sorted;
 }
 
-/**
- * FP Concept: Immutability
- * Although the sorting logic inside is imperative, the function itself
- * preserves functional purity by not modifying the 'original' list and
- * returning a new one.
- */
 NewsList functionalBubbleSort(const NewsList &original) {
   NewsList sorted;
   Node *curr = original.head;
 
   while (curr) {
-    sorted.append(curr->data);
+    sorted.insertAtBack(curr->data);
     curr = curr->next;
   }
 
@@ -259,12 +221,13 @@ NewsList functionalBubbleSort(const NewsList &original) {
   return sorted;
 }
 
-void clearInput() {
+void clearInput(string message = "Invalid Input. Please Try Again.") {
+  cout << message << endl;
   cin.clear();
   cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
-string typeOfSubject() {
+string getSubject() {
   string sub;
   while (true) {
     cout << "\nArticle Available: \n"
@@ -286,15 +249,14 @@ string typeOfSubject() {
   }
 }
 
-void searchMenu(const NewsList &trueNews, const NewsList &fakeNews) {
+void searchArticle(const NewsList &trueNews, const NewsList &fakeNews) {
   int choice, filterType;
 
   cout << "\nSearch which dataset: \n1. True News\n2. Fake News\n0. "
           "Quit\nChoice: ";
 
   if (!(cin >> choice)) {
-    cout << "Invalid input type. Please enter a number." << endl;
-    clearInput();
+    clearInput("Invalid input type. Please enter a number.");
     return;
   }
 
@@ -309,8 +271,7 @@ void searchMenu(const NewsList &trueNews, const NewsList &fakeNews) {
   cout << "1. Search Article by Year.\n2. Search Article by Subject.\nChoice: ";
 
   if (!(cin >> filterType)) {
-    cout << "Invalid input type." << endl;
-    clearInput();
+    clearInput("Invalid input type.");
     return;
   }
 
@@ -321,20 +282,15 @@ void searchMenu(const NewsList &trueNews, const NewsList &fakeNews) {
     int year;
     cout << "\nEnter year to search: ";
     if (!(cin >> year)) {
-      cout << "Invalid year input." << endl;
-      clearInput();
+      clearInput("Invalid year input.");
       return;
     }
     start = high_resolution_clock::now();
-    /**
-     * FP Concept: Lambda Expression
-     * The lambda [year](const NewsArticle &a) captures the 'year' variable
-     * from the outer scope to perform a pure comparison inside the filter.
-     */
+
     results =
         data.filter([year](const NewsArticle &a) { return a.year == year; });
   } else if (filterType == 2) {
-    string sub = typeOfSubject();
+    string sub = getSubject();
     if (sub.empty())
       return;
 
@@ -342,10 +298,7 @@ void searchMenu(const NewsList &trueNews, const NewsList &fakeNews) {
     transform(lowerSub.begin(), lowerSub.end(), lowerSub.begin(), ::tolower);
 
     start = high_resolution_clock::now();
-    /**
-     * FP Concept: Lambda Expression
-     * Captures 'lowerSub' to perform a case-insensitive string comparison.
-     */
+
     results = data.filter([lowerSub](const NewsArticle &a) {
       string cat = a.category;
       transform(cat.begin(), cat.end(), cat.begin(), ::tolower);
@@ -372,11 +325,6 @@ void searchMenu(const NewsList &trueNews, const NewsList &fakeNews) {
   cout << "Total Articles Found: " << results.size << endl;
 }
 
-/**
- * FP Concept: Pure Function
- * This function calculates a percentage based only on its input arguments,
- * without side effects or reliance on global state.
- */
 float calculateMonthPercentage(const NewsList &trueN, const NewsList &fakeN,
                                int m, int y) {
   auto isPolitical = [m, y](const NewsArticle &a) {
@@ -392,7 +340,7 @@ float calculateMonthPercentage(const NewsList &trueN, const NewsList &fakeN,
              : (static_cast<float>(fCount) / (tCount + fCount)) * 100.0f;
 }
 
-void percentageMenu(const NewsList &trueNews, const NewsList &fakeNews) {
+void printNewsPercentage(const NewsList &trueNews, const NewsList &fakeNews) {
   int filterYear;
   string months[12] = {"January",   "February", "March",    "April",
                        "May",       "June",     "July",     "August",
@@ -404,8 +352,7 @@ void percentageMenu(const NewsList &trueNews, const NewsList &fakeNews) {
     cout << "Please enter the year you want to search (Type 0 to quit): ";
 
     if (!(cin >> filterYear)) {
-      cout << "Invalid input. Please enter a numeric year." << endl;
-      clearInput();
+      clearInput("Invalid input. Please enter a numeric year.");
       continue;
     }
 
@@ -430,7 +377,7 @@ void percentageMenu(const NewsList &trueNews, const NewsList &fakeNews) {
   }
 }
 
-void mostFrequentWordMenu(const NewsList &fakeNews) {
+void mostFrequentWord(const NewsList &fakeNews) {
   auto start = high_resolution_clock::now();
   NewsList govNews = fakeNews.filter(
       [](const NewsArticle &a) { return a.category == "Government News"; });
@@ -537,7 +484,7 @@ NewsList readFile(string filename) {
     NewsList articles;
 
     for (auto &row : reader)
-      articles.append({row[0].get(), row[1].get(), row[2].get(), row[3].get()});
+      articles.insertAtBack({row[0].get(), row[1].get(), row[2].get(), row[3].get()});
 
     cout << "Number of " << filename.substr(0, 4)
          << " news loaded: " << articles.size << endl;
@@ -576,19 +523,18 @@ int main() {
     cout << "Choice: ";
 
     if (!(cin >> choice)) {
-      cout << "Invalid input. Please enter a number between 1 and 5." << endl;
-      clearInput();
+      clearInput("Invalid input. Please enter a number between 1 and 5.");
       continue;
     }
 
     if (choice == 1)
-      percentageMenu(trueNews, fakeNews);
+      printNewsPercentage(trueNews, fakeNews);
     else if (choice == 2)
       sortArticle(trueNews, fakeNews);
     else if (choice == 3)
-      mostFrequentWordMenu(fakeNews);
+      mostFrequentWord(fakeNews);
     else if (choice == 4)
-      searchMenu(trueNews, fakeNews);
+      searchArticle(trueNews, fakeNews);
     else if (choice == 0)
       break;
     else
