@@ -74,8 +74,8 @@ g++ -std=c++17 linkedListV2.cpp -o fp
 
 To run the **Linked List (Imperative)** version:
 ```bash
-g++ -std=c++17 linked-list.cpp -o fp
-./fp
+g++ -std=c++17 linked-list.cpp -o ip
+./ip
 ```
 
 To run the **Array 1D** version:
